@@ -16,19 +16,20 @@ k = [400, 500, 500, 300, 400, 500]
 
 # Definição dos nós associados aos elementos
 
-coord = []
+coords = []
 print('Coordenadas (Duplo <enter> finaliza o input)')
-print('nos conectados')
+print('nós conectados')
 i = input()
+
 while i != '':
-    coord.append([float(s) for s in i.split()])
+    coords.append([float(s) for s in i.split()])
     i = input()
 
 # Combinação dos elementos para construção da matriz de rigidez global
 
 lista_posicoes = []
 
-for i in coord:
+for i in coords:
     lista_posicoes.append(list(product(i, repeat=2)))
 print("lista_posicoes: {}".format(lista_posicoes))
 

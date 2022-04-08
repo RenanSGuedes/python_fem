@@ -1,3 +1,4 @@
+# coding=utf-8
 # Sympy, Numpy
 
 from itertools import *

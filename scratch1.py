@@ -1,12 +1,17 @@
-from numpy import *
-
-a = zeros((3, 3))
+from math import *
 
 """
-a[0][0] = 1
-a[1][1] = 1
-a[2][2] = 1
-a[3][3] = 1
+    cos(alpha) = (x1*x2 + y1*y2)/((x1**2 + y1**2)**(-.5)(x2**2+y2**2)**(-.5))  
 """
 
-print(a[0][0])
+x1 = 1
+y1 = 0
+x2 = float(input("x2: "))
+y2 = float(input("y2: "))
+
+cosAlpha = (x1*x2 + y1*y2)/(((x1**2 + y1**2)**.5)*((x2**2+y2**2)**.5))
+
+if x2 < 0 and y2 < 0:
+    print(acos(cosAlpha) + 2*(180 - acos(cosAlpha)))
+
+print(acos(cosAlpha)*180/pi)

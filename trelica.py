@@ -17,6 +17,8 @@ k = E*A/L * [
 ]
 """
 
+"""
+
 fis = [pi/2, 2.5, pi/2, pi]
 
 Es = [5*10**6, 5*10**6, 5*10**6, 5*10**6]
@@ -53,3 +55,5 @@ for i in range(len(fis)):
         [f13.subs(x, fi), f14.subs(x, fi), f15.subs(x, fi), f16.subs(x, fi)]
     ])
     print('Elemento {}: {}'.format(i + 1, k))
+    
+"""

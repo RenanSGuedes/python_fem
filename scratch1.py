@@ -1,4 +1,5 @@
 from sympy import *
+from math import pi
 # Subs in matrix: https://docs.sympy.org/latest/modules/matrices/matrices.html#operations-on-entries
 
 x = symbols("x")

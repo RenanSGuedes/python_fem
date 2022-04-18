@@ -1,4 +1,5 @@
 from sympy import *
+# Subs in matrix: https://docs.sympy.org/latest/modules/matrices/matrices.html#operations-on-entries
 
 x = symbols("x")
 
@@ -46,9 +47,9 @@ for i in range(len(vvs)):
 
 print(fis)
 
-Es = [5*10**6, 5*10**6, 5*10**6, 5*10**6]
-As = [4.91*10**(-2), 4.91*10**(-2), 4.91*10**(-2), 4.91*10**(-2)]
-Ls = [9, 15, 9, 12]
+Es = [30*10**6, 30*10**6, 30*10**6, 5*10**6]
+As = [pi*((.25*10**(-2))**2)/4, pi*((.25*10**(-2))**2)/4, pi*((.25*10**(-2))**2)/4, 4.91*10**(-2)]
+Ls = [(12**2 + 8**2)**.5, 8, 9, 12]
 
 for i in range(len(fis)):
     fi = fis[i]*pi/180
@@ -69,3 +70,13 @@ for i in range(len(fis)):
          cte*(cos(x)*sin(x)).subs(x, fi), cte*(sin(x)**2).subs(x, fi)]
     ]
     print('Elemento {}: {}'.format(i + 1, k))
+
+matrixDimension = 5
+initialMatrix = []
+
+for i in range(matrixDimension):
+    initialMatrix.append([])
+    for j in range(matrixDimension):
+        initialMatrix[i].append(0)
+
+print(initialMatrix)

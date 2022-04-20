@@ -1,5 +1,4 @@
-from sympy import *
-from math import pi
+from sympy import pi, sin, cos, symbols, acos
 # Subs in matrix: https://docs.sympy.org/latest/modules/matrices/matrices.html#operations-on-entries
 
 x = symbols("x")
@@ -48,36 +47,44 @@ for i in range(len(vvs)):
 
 print(fis)
 
-Es = [30*10**6, 30*10**6, 30*10**6, 5*10**6]
-As = [pi*((.25*10**(-2))**2)/4, pi*((.25*10**(-2))**2)/4, pi*((.25*10**(-2))**2)/4, 4.91*10**(-2)]
-Ls = [(12**2 + 8**2)**.5, 8, 9, 12]
+Es = [30*10**10, 30*10**10]  # SI
+As = [pi*((.25*10**(-2))**2)/4, pi*((.25*10**(-2))**2)/4, pi*((.25*10**(-2))**2)/4, 4.91*10**(-2)]  # SI
+Ls = [((12*10**(-2))**2 + (8*10**(-2))**2)**.5, 8*10**(-2), 9, 12]
+
+lista = []
 
 for i in range(len(fis)):
-    fi = fis[i]*pi/180
-    E = Es[i]
-    A = As[i]
-    L = Ls[i]
+    fi = float(fis[i]*pi/180)
+    E = float(Es[i])
+    A = float(As[i])
+    L = float(Ls[i])
 
-    cte = E*A/L*10**(-3)
+    cte = E*A/L*.01
+
+    aA = float("{:.2f}".format(cte*(cos(x) ** 2).subs(x, fi)))
+    bB = float("{:.2f}".format(cte*(cos(x)*sin(x)).subs(x, fi)))
+    cC = float("{:.2f}".format(cte*(-cos(x)**2).subs(x, fi)))
+    dD = float("{:.2f}".format(cte*(-cos(x)*sin(x)).subs(x, fi)))
+    eE = float("{:.2f}".format(cte*(cos(x)*sin(x)).subs(x, fi)))
+    fF = float("{:.2f}".format(cte*(sin(x)**2).subs(x, fi)))
+    gG = float("{:.2f}".format(cte*(-cos(x)*sin(x)).subs(x, fi)))
+    hH = float("{:.2f}".format(cte*(-sin(x)**2).subs(x, fi)))
+    iI = float("{:.2f}".format(cte*(-cos(x)**2).subs(x, fi)))
+    jJ = float("{:.2f}".format(cte*(-cos(x)*sin(x)).subs(x, fi)))
+    kK = float("{:.2f}".format(cte*(cos(x)*sin(x)).subs(x, fi)))
+    lL = float("{:.2f}".format(cte*(cos(x)**2).subs(x, fi)))
+    mM = float("{:.2f}".format(cte*(-cos(x)*sin(x)).subs(x, fi)))
+    nN = float("{:.2f}".format(cte*(-sin(x)**2).subs(x, fi)))
+    oO = float("{:.2f}".format(cte*(cos(x)*sin(x)).subs(x, fi)))
+    pP = float("{:.2f}".format(cte*(sin(x)**2).subs(x, fi)))
 
     k = [
-        [cte*(cos(x)**2).subs(x, fi), cte*(cos(x)*sin(x)).subs(x, fi),
-         cte*(-cos(x)**2).subs(x, fi), cte*(-cos(x)*sin(x)).subs(x, fi)],
-        [cte*(cos(x)*sin(x)).subs(x, fi), cte*(sin(x)**2).subs(x, fi),
-         cte*(-cos(x)*sin(x)).subs(x, fi), cte*(-sin(x)**2).subs(x, fi)],
-        [cte*(-cos(x)**2).subs(x, fi), cte*(-cos(x)*sin(x)).subs(x, fi),
-         cte*(cos(x)**2).subs(x, fi), cte*(cos(x)*sin(x)).subs(x, fi)],
-        [cte*(-cos(x)*sin(x)).subs(x, fi), cte*(-sin(x)**2).subs(x, fi),
-         cte*(cos(x)*sin(x)).subs(x, fi), cte*(sin(x)**2).subs(x, fi)]
+        [aA, bB, cC, dD],
+        [eE, fF, gG, hH],
+        [iI, jJ, kK, lL],
+        [mM, nN, oO, pP]
     ]
+    lista.append(k)
+
     print('Elemento {}: {}'.format(i + 1, k))
 
-matrixDimension = 5
-initialMatrix = []
-
-for i in range(matrixDimension):
-    initialMatrix.append([])
-    for j in range(matrixDimension):
-        initialMatrix[i].append(0)
-
-print(initialMatrix)

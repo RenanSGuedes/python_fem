@@ -10,6 +10,7 @@ x1 = 1
 y1 = 0
 
 n_elementos = int(input("n_elementos: "))
+coords = int(input("n_coords: "))
 vvs = []
 
 xp1s = []
@@ -92,21 +93,28 @@ for i in range(len(fis)):
 
     print('Elemento {}: {}'.format(i + 1, k))
 
+# Define listaGlobal
+listaGlobal = []
 
-listaGlobal = [
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-]
+# Insere linhas em listaGlobal
+for i in range(2*coords):
+    listaGlobal.append([])
 
+# Insere zeros nas linhas de listaGlobal
+for i in range(2*coords):
+    for j in range(2*coords):
+        listaGlobal[i].append(0)
+
+print("listaGlobal: {}".format(listaGlobal))
+
+# Cria uma lista com os índices duplos que servirão de referência aos índices do python
 linha = []
 
-for i in range(n_elementos):
+for i in range(coords):
     linha.append(i + 1)
     linha.append(i + 1)
+
+print("linha: {}".format(linha))
 
 indicesElementos = []
 # indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
@@ -120,17 +128,20 @@ for i in range(n_elementos):
     print(30*"-")
     indicesElementos.append([n1, n2])
 
-print(indicesElementos)
+print("indicesElementos: ".format(indicesElementos))
+print(30*"-")
 
-indices = [[0, 1, 2, 3], [2, 3, 4, 5]]  # Para cada elemento
 
-"""
+indices = []
+
+for i in range(n_elementos):
+    indices.append([])
+
 for j in range(len(indicesElementos)):
     for i in indicesElementos[j]:
         for item in range(len(linha)):
             if linha[item] == i:
                 indices[j].append(item)
-"""
 
 print("indices =", indices)
 
@@ -140,13 +151,3 @@ for k in range(len(lista)):
             listaGlobal[newItem][item] += lista[k][i][j]
 
 print(listaGlobal)
-
-
-
-
-
-
-
-
-
-

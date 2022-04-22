@@ -3,28 +3,25 @@ from sympy import pi, sin, cos, symbols, acos
 
 x = symbols("x")
 
-fis = []
-Ls = []
-
-x1 = 1
-y1 = 0
+fis, Ls, Es, As = [], [], [], []
+x1, y1 = 1, 0
 
 n_elementos = int(input("n_elementos: "))
 coords = int(input("n_coords: "))
 vvs = []
 
-xp1s = []
-yp1s = []
-xp2s = []
-yp2s = []
+xp1s, yp1s, xp2s, yp2s = [], [], [], []
 
 for i in range(n_elementos):
     print("Elemento {}".format(i + 1))
-    xp1 = float(input("x(p1): "))
-    yp1 = float(input("y(p1): "))
+    xp1, yp1 = float(input("x(p1): ")), float(input("y(p1): "))
     print(15*"-")
-    xp2 = float(input("x(p2): "))
-    yp2 = float(input("y(p2): "))
+    xp2, yp2, Ei, D = [
+        float(input("x(p2): ")),
+        float(input("y(p2): ")),
+        float(input("Módulo de elasticidade: ")),
+        float(input("Diâmetro: "))
+    ]
 
     xp1s.append(xp1)
     yp1s.append(yp1)
@@ -35,6 +32,8 @@ for i in range(n_elementos):
 
     vvs.append([xp2 - xp1, yp2 - yp1])
     Ls.append(comprimento)
+    Es.append(Ei)
+    As.append(pi/4*D**2)
 
 print("vvs:", vvs)
 
@@ -52,9 +51,6 @@ for i in range(len(vvs)):
 
 print("ângulos: {}".format(fis))
 print("comprimentos: {}".format(Ls))
-
-Es = [30*10**6, 30*10**6, 30*10**6, 30*10**6]  # SI
-As = [.0490874, .0490874, .0490874, .0490874]  # SI
 
 lista = []
 
@@ -89,7 +85,12 @@ for i in range(len(fis)):
         [iI, jJ, kK, lL],
         [mM, nN, oO, pP]
     ]
+
     lista.append(k)
+
+    for n in range(len(k)):
+        for j in range(len(k)):
+            k[n][j] = float(format(float(k[n][j]), ".1f"))
 
     print('Elemento {}: {}'.format(i + 1, k))
 
@@ -149,5 +150,9 @@ for k in range(len(lista)):
     for (newItem, i) in zip(indices[k], range(0, 4, 1)):
         for (item, j) in zip(indices[k], range(0, 4, 1)):
             listaGlobal[newItem][item] += lista[k][i][j]
+
+for i in range(len(listaGlobal)):
+    for j in range(len(listaGlobal)):
+        listaGlobal[i][j] = float(format(float(listaGlobal[i][j]), ".1f"))
 
 print(listaGlobal)

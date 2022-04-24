@@ -1,4 +1,6 @@
 from sympy import pi, sin, cos, symbols, acos
+import numpy as np
+import array_to_latex as a2l
 # Subs in matrix: https://docs.sympy.org/latest/modules/matrices/matrices.html#operations-on-entries
 
 x = symbols("x")
@@ -35,6 +37,7 @@ for i in range(n_elementos):
     Es.append(Ei)
     As.append(pi/4*D**2)
 
+print(90*"-")
 print("vvs:", vvs)
 
 for i in range(len(vvs)):
@@ -49,7 +52,9 @@ for i in range(len(vvs)):
     else:
         fis.append("ok")
 
+print(90*"-")
 print("ângulos: {}".format(fis))
+print(90*"-")
 print("comprimentos: {}".format(Ls))
 
 lista = []
@@ -72,8 +77,8 @@ for i in range(len(fis)):
     hH = cte*(-sin(x)**2).subs(x, fi)
     iI = cte*(-cos(x)**2).subs(x, fi)
     jJ = cte*(-cos(x)*sin(x)).subs(x, fi)
-    kK = cte*(cos(x)*sin(x)).subs(x, fi)
-    lL = cte*(cos(x)**2).subs(x, fi)
+    kK = cte*(cos(x)**2).subs(x, fi)
+    lL = cte*(cos(x)*sin(x)).subs(x, fi)
     mM = cte*(-cos(x)*sin(x)).subs(x, fi)
     nN = cte*(-sin(x)**2).subs(x, fi)
     oO = cte*(cos(x)*sin(x)).subs(x, fi)
@@ -92,7 +97,11 @@ for i in range(len(fis)):
         for j in range(len(k)):
             k[n][j] = float(format(float(k[n][j]), ".1f"))
 
+    print(90 * "-")
     print('Elemento {}: {}'.format(i + 1, k))
+    print(90*"-")
+    kLaTeXForm = np.array(k)
+    a2l.to_ltx(kLaTeXForm)
 
 # Define listaGlobal
 listaGlobal = []
@@ -106,6 +115,7 @@ for i in range(2*coords):
     for j in range(2*coords):
         listaGlobal[i].append(0)
 
+print(90*"-")
 print("listaGlobal: {}".format(listaGlobal))
 
 # Cria uma lista com os índices duplos que servirão de referência aos índices do python
@@ -115,13 +125,15 @@ for i in range(coords):
     linha.append(i + 1)
     linha.append(i + 1)
 
+print(90*"-")
 print("linha: {}".format(linha))
 
 indicesElementos = []
 # indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
 
+print(90*"-")
 print("Elementos e nós associados: ")
-print(30*"-")
+print(90*"-")
 for i in range(n_elementos):
     print("Elemento {}: ".format(i + 1))
     n1 = int(input("Nó 1: "))
@@ -129,9 +141,8 @@ for i in range(n_elementos):
     print(30*"-")
     indicesElementos.append([n1, n2])
 
-print("indicesElementos: ".format(indicesElementos))
-print(30*"-")
-
+print("indicesElementos: {}".format(indicesElementos))
+print(90*"-")
 
 indices = []
 
@@ -144,6 +155,7 @@ for j in range(len(indicesElementos)):
             if linha[item] == i:
                 indices[j].append(item)
 
+print(90*"-")
 print("indices =", indices)
 
 for k in range(len(lista)):
@@ -155,4 +167,12 @@ for i in range(len(listaGlobal)):
     for j in range(len(listaGlobal)):
         listaGlobal[i][j] = float(format(float(listaGlobal[i][j]), ".1f"))
 
-print(listaGlobal)
+print(90*"-")
+print("listaGlobal: {}".format(listaGlobal))
+
+myMatrix = np.array(listaGlobal)
+print(90*"-")
+print("LaTeX code...")
+print(90*"-")
+latexMatrix = a2l.to_ltx(myMatrix)
+print(90*"-")

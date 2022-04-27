@@ -1,7 +1,7 @@
 from sympy import pi, sin, cos, symbols, acos
 import numpy as np
 import array_to_latex as a2l
-from pylatex import Document, Section, Subsection, Math, Matrix, VectorName
+from pylatex import Document, Section, Subsection, Math, Matrix, NoEscape, Subsubsection
 # Subs in matrix: https://docs.sympy.org/latest/modules/matrices/matrices.html#operations-on-entries
 
 x = symbols("x")
@@ -186,12 +186,35 @@ if __name__ == '__main__':
     section = Section('Método dos elementos finitos: Treliça Plana')
     doc.append(section)
 
+    subsection = Subsection('Componentes do sistema')
+
+    subsection.append('Número de barras da estrutura: {}\n'.format(n_elementos))
+    subsection.append('Número de nós da estrutura: {}'.format(coords))
+
+    subsubsection = Subsubsection('Comprimento das barras')
+
+    for i in range(len(Ls)):
+        if i == (len(Ls) - 1):
+            subsubsection.append('Barra {}: {} cm'.format(i + 1, Ls[i]))
+        else:
+            subsubsection.append('Barra {}: {} cm\n'.format(i + 1, Ls[i]))
+
+    subsection.append(subsubsection)
+
+    subsubsection = Subsubsection('Módulo de elasticidade das barras (MPa)')
+
+    subsubsection.append('E = {} MPa'.format(Es[1]/10**6))
+
+    subsection.append(subsubsection)
+
+    section.append(subsection)
+
     subsection = Subsection('Matrizes de rigidez dos elementos')
 
     for i in range(len(lista)):
         k = np.matrix(lista[i])
         matrix = Matrix(k, mtype='b')
-        math = Math(data=['k({})='.format(i), matrix])
+        math = Math(data=['k({})='.format(i + 1), matrix])
         subsection.append(math)
 
     section.append(subsection)
@@ -204,5 +227,10 @@ if __name__ == '__main__':
     subsection.append(math)
 
     section.append(subsection)
+
+    section = Section('Hello')
+    section.append(NoEscape('$ax^2 + bx + c = 0$'))
+
+    doc.append(section)
 
     doc.generate_pdf('numpy_ex', clean_tex=False)

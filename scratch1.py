@@ -1,6 +1,7 @@
 from sympy import pi, sin, cos, symbols, acos
 import numpy as np
 import array_to_latex as a2l
+from pylatex import Document, Section, Subsection, Math, Matrix, VectorName
 # Subs in matrix: https://docs.sympy.org/latest/modules/matrices/matrices.html#operations-on-entries
 
 x = symbols("x")
@@ -176,3 +177,32 @@ print("LaTeX code...")
 print(90*"-")
 latexMatrix = a2l.to_ltx(myMatrix)
 print(90*"-")
+
+# -----------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    doc = Document()
+
+    section = Section('Método dos elementos finitos: Treliça Plana')
+    doc.append(section)
+
+    subsection = Subsection('Matrizes de rigidez dos elementos')
+
+    for i in range(len(lista)):
+        k = np.matrix(lista[i])
+        matrix = Matrix(k, mtype='b')
+        math = Math(data=['k({})='.format(i), matrix])
+        subsection.append(math)
+
+    section.append(subsection)
+
+    subsection = Subsection('Matriz de rigidez Global')
+
+    K = np.matrix(listaGlobal)
+    matrix = Matrix(K, mtype='b')
+    math = Math(data=['K=', matrix])
+    subsection.append(math)
+
+    section.append(subsection)
+
+    doc.generate_pdf('numpy_ex', clean_tex=False)

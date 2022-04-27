@@ -1,0 +1,49 @@
+\documentclass{article}%
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{lmodern}%
+\usepackage{textcomp}%
+
+\usepackage{amsmath}%
+%
+%
+%
+\begin{document}%
+\normalsize%
+\section{Método dos elementos finitos: Treliça Plana}%
+\label{sec:MtododoselementosfinitosTreliaPlana}%
+\subsection{Matrizes de rigidez dos elementos}%
+\label{subsec:Matrizesderigidezdoselementos}%
+\[%
+k(0)= \begin{bmatrix}%
+70.7&47.1&-70.7&-47.1\\%
+47.1&31.4&-47.1&-31.4\\%
+-70.7&-47.1&70.7&47.1\\%
+-47.1&-31.4&47.1&31.4%
+\end{bmatrix}%
+\]%
+\[%
+k(1)= \begin{bmatrix}%
+0.0&0.0&-0.0&-0.0\\%
+0.0&184.1&-0.0&-184.1\\%
+-0.0&-0.0&0.0&0.0\\%
+-0.0&-184.1&0.0&184.1%
+\end{bmatrix}%
+\]
+
+%
+\subsection{Matriz de rigidez Global}%
+\label{subsec:MatrizderigidezGlobal}%
+\[%
+K= \begin{bmatrix}%
+70.7&47.1&-70.7&-47.1&0.0&0.0\\%
+47.1&31.4&-47.1&-31.4&0.0&0.0\\%
+-70.7&-47.1&70.7&47.1&0.0&0.0\\%
+-47.1&-31.4&47.1&215.5&0.0&-184.1\\%
+0.0&0.0&0.0&0.0&0.0&0.0\\%
+0.0&0.0&0.0&-184.1&0.0&184.1%
+\end{bmatrix}%
+\]
+
+%
+\end{document}

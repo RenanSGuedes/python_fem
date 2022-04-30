@@ -181,7 +181,7 @@ latexMatrix = a2l.to_ltx(myMatrix)
 print(90 * "-")
 
 # -----------------------------------------------------------------------------------
-
+"""
 if __name__ == '__main__':
     doc = Document()
 
@@ -296,3 +296,4 @@ if __name__ == '__main__':
     section.append(subsection)
 
     doc.generate_pdf('numpy_ex_1', clean_tex=False)
+"""

@@ -5,6 +5,22 @@ import numpy as np
 from sympy import pi, sin, cos, symbols, acos
 import array_to_latex as a2l
 
+
+def bmatrix(a):
+    """Returns a LaTeX bmatrix
+
+    :a: numpy array
+    :returns: LaTeX bmatrix as a string
+    """
+    if len(a.shape) > 2:
+        raise ValueError('bmatrix can at most display two dimensions')
+    lines = str(a).replace('[', '').replace(']', '').splitlines()
+    rv = [r'\begin{bmatrix}']
+    rv += ['  ' + ' & '.join(l.split()) + r'\\' for l in lines]
+    rv += [r'\end{bmatrix}']
+    return '\n'.join(rv)
+
+
 x = symbols("x")
 
 fis, Ls, Es, As = [], [], [], []
@@ -24,69 +40,93 @@ st.write('A primeira parte considera a quantidade de elementos e coordenadas pre
 
 col1, col2 = st.columns(2)
 
-with col1:
-    n_elementos = st.text_input('Número de elementos',
-                                value="0",
-                                max_chars=None,
-                                key='123',
-                                type="default",
-                                help=None,
-                                autocomplete=None,
-                                on_change=None,
-                                args=None,
-                                kwargs=None,
-                                placeholder='Elementos',
-                                disabled=False)
-
-with col2:
-    coords = st.text_input('Número de coordenadas',
-                           value="0",
-                           max_chars=None,
-                           key='345',
-                           type="default",
-                           help=None,
-                           autocomplete=None,
-                           on_change=None,
-                           args=None,
-                           kwargs=None,
-                           placeholder='Coordenadas',
-                           disabled=False)
-
 st.header('Especificando os elementos')
 
-for i in range(int(n_elementos)):
-    st.subheader("Elemento {}".format(i + 1))
-    xp1, yp1 = st.text_input('x(p1)',
-                             value="0",
-                             key='x_key{}'.format(i),
-                             placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                 value="0",
-                                                                 key='x_key{}'.format(i),
-                                                                 type="default",
-                                                                 placeholder='y(p1)'),
+with col1:
+    n_elementos = st.number_input('Número de elementos',
+                                  min_value=1,
+                                  max_value=100,
+                                  value=1,
+                                  step=1,
+                                  key='id_n_elementos')
 
-    xp2, yp2, Ei, D = [
-        st.text_input('x(p2)',
-                      value="0",
-                      key='x_key{}'.format(i),
-                      placeholder='x(p2)',
-                      disabled=False),
-        st.text_input('y(p2)',
-                      value="0",
-                      key='x_key{}'.format(i),
-                      placeholder='y(p2)',
-                      disabled=False),
-        st.text_input('Ei',
-                      value="0",
-                      key='x_key{}'.format(i),
-                      placeholder='Módulo de elasticidade',
-                      disabled=False),
-        st.text_input('D',
-                      value="0",
-                      key='x_key{}'.format(i),
-                      placeholder='Diâmetro da barra',
-                      disabled=False)
-    ]
+with col2:
+    coords = st.number_input('Número de coordenadas',
+                             min_value=1,
+                             max_value=100,
+                             value=1,
+                             step=1,
+                             key='id_coords')
+
+for i in range(int(n_elementos)):
+    if i % 2 == 0:
+        with col1:
+            st.subheader("Elemento {}".format(i + 1))
+            xp1, yp1 = st.text_input('x(p1)',
+                                     value="0",
+                                     key='x_key{}'.format(i),
+                                     placeholder='x(p1)'), st.text_input('y(p1)',
+                                                                         value="0",
+                                                                         key='x_key{}'.format(i),
+                                                                         type="default",
+                                                                         placeholder='y(p1)'),
+
+            xp2, yp2, Ei, D = [
+                st.text_input('x(p2)',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='x(p2)',
+                              disabled=False),
+                st.text_input('y(p2)',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='y(p2)',
+                              disabled=False),
+                st.text_input('Ei',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='Módulo de elasticidade',
+                              disabled=False),
+                st.text_input('D',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='Diâmetro da barra',
+                              disabled=False)
+            ]
+    else:
+        with col2:
+            st.subheader("Elemento {}".format(i + 1))
+            xp1, yp1 = st.text_input('x(p1)',
+                                     value="0",
+                                     key='x_key{}'.format(i),
+                                     placeholder='x(p1)'), st.text_input('y(p1)',
+                                                                         value="0",
+                                                                         key='x_key{}'.format(i),
+                                                                         type="default",
+                                                                         placeholder='y(p1)'),
+
+            xp2, yp2, Ei, D = [
+                st.text_input('x(p2)',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='x(p2)',
+                              disabled=False),
+                st.text_input('y(p2)',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='y(p2)',
+                              disabled=False),
+                st.text_input('Ei',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='Módulo de elasticidade',
+                              disabled=False),
+                st.text_input('D',
+                              value="0",
+                              key='x_key{}'.format(i),
+                              placeholder='Diâmetro da barra',
+                              disabled=False)
+            ]
 
     xp1s.append(float(xp1))
     yp1s.append(float(yp1))
@@ -100,4 +140,152 @@ for i in range(int(n_elementos)):
     Es.append(Ei)
     As.append(pi / 4 * float(D) ** 2)
 
-st.header(vvs)
+for i in range(len(vvs)):
+    cosAlpha = (x1 * vvs[i][0] + y1 * vvs[i][1]) / (
+            ((x1 ** 2 + y1 ** 2) ** .5) * ((vvs[i][0] ** 2 + vvs[i][1] ** 2) ** .5))
+
+    if (vvs[i][0] >= 0 and vvs[i][1] >= 0) or (vvs[i][0] <= 0 <= vvs[i][1]):
+        fis.append(float(acos(cosAlpha) * 180 / pi))
+    elif vvs[i][0] <= 0 and vvs[i][1] <= 0:
+        fis.append(float(acos(cosAlpha) * 180 / pi + 2 * (180 - acos(cosAlpha) * 180 / pi)))
+    elif vvs[i][0] >= 0 >= vvs[i][1]:
+        fis.append(float(acos(cosAlpha) * 180 / pi + 360 - 2 * acos(cosAlpha) * 180 / pi))
+    else:
+        fis.append("ok")
+
+lista = []
+
+for i in range(len(fis)):
+    fi = float(fis[i] * pi / 180)
+    E = float(Es[i])
+    A = float(As[i])
+    L = float(Ls[i])
+
+    cte = E * A / L * .001
+
+    aA = cte * (cos(x) ** 2).subs(x, fi)
+    bB = cte * (cos(x) * sin(x)).subs(x, fi)
+    cC = cte * (-cos(x) ** 2).subs(x, fi)
+    dD = cte * (-cos(x) * sin(x)).subs(x, fi)
+    eE = cte * (cos(x) * sin(x)).subs(x, fi)
+    fF = cte * (sin(x) ** 2).subs(x, fi)
+    gG = cte * (-cos(x) * sin(x)).subs(x, fi)
+    hH = cte * (-sin(x) ** 2).subs(x, fi)
+    iI = cte * (-cos(x) ** 2).subs(x, fi)
+    jJ = cte * (-cos(x) * sin(x)).subs(x, fi)
+    kK = cte * (cos(x) ** 2).subs(x, fi)
+    lL = cte * (cos(x) * sin(x)).subs(x, fi)
+    mM = cte * (-cos(x) * sin(x)).subs(x, fi)
+    nN = cte * (-sin(x) ** 2).subs(x, fi)
+    oO = cte * (cos(x) * sin(x)).subs(x, fi)
+    pP = cte * (sin(x) ** 2).subs(x, fi)
+
+    k = [
+        [aA, bB, cC, dD],
+        [eE, fF, gG, hH],
+        [iI, jJ, kK, lL],
+        [mM, nN, oO, pP]
+    ]
+
+    lista.append(k)
+
+    for n in range(len(k)):
+        for j in range(len(k)):
+            k[n][j] = float(format(float(k[n][j]), ".1f"))
+
+    kLaTeXForm = np.array(k)
+
+    st.subheader('Matrix de rigidez do elemento {}'.format(i + 1))
+    st.latex("k_{}={}".format(
+        i + 1,
+        bmatrix(kLaTeXForm)
+    ))
+
+# Define listaGlobal
+listaGlobal = []
+
+# Insere linhas em listaGlobal
+for i in range(2 * int(coords)):
+    listaGlobal.append([])
+
+# Insere zeros nas linhas de listaGlobal
+for i in range(2 * int(coords)):
+    for j in range(2 * int(coords)):
+        listaGlobal[i].append(0)
+
+# Cria uma lista com os índices duplos que servirão de referência aos índices do python
+linha = []
+
+for i in range(int(coords)):
+    linha.append(i + 1)
+    linha.append(i + 1)
+
+indicesElementos = []
+# indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
+
+st.header('Nós associados aos elementos')
+
+for i in range(int(n_elementos)):
+    if i % 2 == 0:
+        with col1:
+            st.write('Elemento {}'.format(i + 1))
+            n1 = st.number_input('n1',
+                                 min_value=1,
+                                 max_value=int(coords),
+                                 value=1,
+                                 step=1,
+                                 key='id_n1_{}'.format(i))
+
+            n2 = st.number_input('n2',
+                                 min_value=1,
+                                 max_value=int(coords),
+                                 value=1,
+                                 step=1,
+                                 key='id_n2_{}'.format(i))
+
+            indicesElementos.append([n1, n2])
+    else:
+        with col2:
+            st.write('Elemento {}'.format(i + 1))
+            n1 = st.number_input('n1',
+                                 min_value=1,
+                                 max_value=int(coords),
+                                 value=1,
+                                 step=1,
+                                 key='id_n1_{}'.format(i))
+
+            n2 = st.number_input('n2',
+                                 min_value=1,
+                                 max_value=int(coords),
+                                 value=1,
+                                 step=1,
+                                 key='id_n2_{}'.format(i))
+
+            indicesElementos.append([n1, n2])
+
+indices = []
+
+for i in range(int(n_elementos)):
+    indices.append([])
+
+for j in range(len(indicesElementos)):
+    for i in indicesElementos[j]:
+        for item in range(len(linha)):
+            if linha[item] == i:
+                indices[j].append(item)
+
+for k in range(len(lista)):
+    for (newItem, i) in zip(indices[k], range(0, 4, 1)):
+        for (item, j) in zip(indices[k], range(0, 4, 1)):
+            listaGlobal[newItem][item] += lista[k][i][j]
+
+for i in range(len(listaGlobal)):
+    for j in range(len(listaGlobal)):
+        listaGlobal[i][j] = float(format(float(listaGlobal[i][j]), ".1f"))
+
+listaGlobalNumpy = np.array(listaGlobal)
+
+st.subheader('Matrix de rigidez global')
+st.latex("K={}".format(
+    bmatrix(listaGlobalNumpy)
+))

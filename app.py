@@ -34,13 +34,13 @@ st.title('Método dos Elementos Finitos')
 image = Image.open('./greenhouse.jpg')
 st.image(image, use_column_width=True)
 
+st.header('Especificando os elementos')
+
 st.write('A primeira parte considera a quantidade de elementos e coordenadas presentes na estrutura. Aqui os '
          'elementos representam a quantidade de barras da estrutura da treliça, enquanto que as coordenadas são os '
          'nós que ligam as barras entre si.')
 
 col1, col2 = st.columns(2)
-
-st.header('Especificando os elementos')
 
 with col1:
     n_elementos = st.number_input('Número de elementos',
@@ -61,72 +61,74 @@ with col2:
 for i in range(int(n_elementos)):
     if i % 2 == 0:
         with col1:
-            st.subheader("Elemento {}".format(i + 1))
-            xp1, yp1 = st.text_input('x(p1)',
-                                     value="0",
-                                     key='x_key{}'.format(i),
-                                     placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                         value="0",
-                                                                         key='x_key{}'.format(i),
-                                                                         type="default",
-                                                                         placeholder='y(p1)'),
+            with st.expander("Elemento {}".format(i + 1)):
+                st.subheader("Elemento {}".format(i + 1))
+                xp1, yp1 = st.text_input('x(p1)',
+                                         value="0",
+                                         key='x_key{}'.format(i),
+                                         placeholder='x(p1)'), st.text_input('y(p1)',
+                                                                             value="0",
+                                                                             key='x_key{}'.format(i),
+                                                                             type="default",
+                                                                             placeholder='y(p1)'),
 
-            xp2, yp2, Ei, D = [
-                st.text_input('x(p2)',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='x(p2)',
-                              disabled=False),
-                st.text_input('y(p2)',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='y(p2)',
-                              disabled=False),
-                st.text_input('Ei',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='Módulo de elasticidade',
-                              disabled=False),
-                st.text_input('D',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='Diâmetro da barra',
-                              disabled=False)
-            ]
+                xp2, yp2, Ei, D = [
+                    st.text_input('x(p2)',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='x(p2)',
+                                  disabled=False),
+                    st.text_input('y(p2)',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='y(p2)',
+                                  disabled=False),
+                    st.text_input('Ei',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='Módulo de elasticidade',
+                                  disabled=False),
+                    st.text_input('D',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='Diâmetro da barra',
+                                  disabled=False)
+                ]
     else:
         with col2:
-            st.subheader("Elemento {}".format(i + 1))
-            xp1, yp1 = st.text_input('x(p1)',
-                                     value="0",
-                                     key='x_key{}'.format(i),
-                                     placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                         value="0",
-                                                                         key='x_key{}'.format(i),
-                                                                         type="default",
-                                                                         placeholder='y(p1)'),
+            with st.expander("Elemento {}".format(i + 1)):
+                st.subheader("Elemento {}".format(i + 1))
+                xp1, yp1 = st.text_input('x(p1)',
+                                         value="0",
+                                         key='x_key{}'.format(i),
+                                         placeholder='x(p1)'), st.text_input('y(p1)',
+                                                                             value="0",
+                                                                             key='x_key{}'.format(i),
+                                                                             type="default",
+                                                                             placeholder='y(p1)'),
 
-            xp2, yp2, Ei, D = [
-                st.text_input('x(p2)',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='x(p2)',
-                              disabled=False),
-                st.text_input('y(p2)',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='y(p2)',
-                              disabled=False),
-                st.text_input('Ei',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='Módulo de elasticidade',
-                              disabled=False),
-                st.text_input('D',
-                              value="0",
-                              key='x_key{}'.format(i),
-                              placeholder='Diâmetro da barra',
-                              disabled=False)
-            ]
+                xp2, yp2, Ei, D = [
+                    st.text_input('x(p2)',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='x(p2)',
+                                  disabled=False),
+                    st.text_input('y(p2)',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='y(p2)',
+                                  disabled=False),
+                    st.text_input('Ei',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='Módulo de elasticidade',
+                                  disabled=False),
+                    st.text_input('D',
+                                  value="0",
+                                  key='x_key{}'.format(i),
+                                  placeholder='Diâmetro da barra',
+                                  disabled=False)
+                ]
 
     xp1s.append(float(xp1))
     yp1s.append(float(yp1))
@@ -223,45 +225,44 @@ for i in range(int(coords)):
 indicesElementos = []
 # indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
 
-st.header('Nós associados aos elementos')
-
+st.title('Nós associados aos elementos')
 for i in range(int(n_elementos)):
     if i % 2 == 0:
         with col1:
-            st.write('Elemento {}'.format(i + 1))
-            n1 = st.number_input('n1',
-                                 min_value=1,
-                                 max_value=int(coords),
-                                 value=1,
-                                 step=1,
-                                 key='id_n1_{}'.format(i))
+            with st.expander("Elemento {}".format(i + 1)):
+                n1 = st.number_input('n1',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n1_{}'.format(i))
 
-            n2 = st.number_input('n2',
-                                 min_value=1,
-                                 max_value=int(coords),
-                                 value=1,
-                                 step=1,
-                                 key='id_n2_{}'.format(i))
+                n2 = st.number_input('n2',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n2_{}'.format(i))
 
-            indicesElementos.append([n1, n2])
+                indicesElementos.append([n1, n2])
     else:
         with col2:
-            st.write('Elemento {}'.format(i + 1))
-            n1 = st.number_input('n1',
-                                 min_value=1,
-                                 max_value=int(coords),
-                                 value=1,
-                                 step=1,
-                                 key='id_n1_{}'.format(i))
+            with st.expander("Elemento {}".format(i + 1)):
+                n1 = st.number_input('n1',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n1_{}'.format(i))
 
-            n2 = st.number_input('n2',
-                                 min_value=1,
-                                 max_value=int(coords),
-                                 value=1,
-                                 step=1,
-                                 key='id_n2_{}'.format(i))
+                n2 = st.number_input('n2',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n2_{}'.format(i))
 
-            indicesElementos.append([n1, n2])
+                indicesElementos.append([n1, n2])
 
 indices = []
 

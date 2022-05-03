@@ -1,9 +1,11 @@
 import streamlit as st
 from PIL import Image
-import pandas as pd
 import numpy as np
 from sympy import pi, sin, cos, symbols, acos
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import array_to_latex as a2l
+from mpl_toolkits.mplot3d import axes3d
 
 
 def bmatrix(a):
@@ -31,10 +33,13 @@ vvs = []
 xp1s, yp1s, xp2s, yp2s = [], [], [], []
 
 st.title('Método dos Elementos Finitos')
-image = Image.open('./greenhouse.jpg')
+image = Image.open('./struc.png')
 st.image(image, use_column_width=True)
 
 st.header('Especificando os elementos')
+
+image = Image.open('./images/structure.png')
+st.image(image, use_column_width=True)
 
 st.write('A primeira parte considera a quantidade de elementos e coordenadas presentes na estrutura. Aqui os '
          'elementos representam a quantidade de barras da estrutura da treliça, enquanto que as coordenadas são os '
@@ -157,6 +162,9 @@ for i in range(len(vvs)):
 
 lista = []
 
+st.header("Matriz de rigidez de cada elemento")
+image = Image.open('./images/truss.png')
+st.image(image, use_column_width=True)
 for i in range(len(fis)):
     fi = float(fis[i] * pi / 180)
     E = float(Es[i])
@@ -225,7 +233,6 @@ for i in range(int(coords)):
 indicesElementos = []
 # indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
 
-st.title('Nós associados aos elementos')
 for i in range(int(n_elementos)):
     if i % 2 == 0:
         with col1:
@@ -286,7 +293,28 @@ for i in range(len(listaGlobal)):
 
 listaGlobalNumpy = np.array(listaGlobal)
 
-st.subheader('Matrix de rigidez global')
+st.header('Matrix de rigidez global')
+image = Image.open('images/clock.png')
+st.image(image, use_column_width=True)
 st.latex("K={}".format(
     bmatrix(listaGlobalNumpy)
 ))
+
+# -------------------------------
+
+elevation = st.slider('Rotação 1', 0, 90, 0)
+azimuth = st.slider('Rotação 2', 0, 360, 0)
+
+fig = plt.figure(figsize=(8, 8))
+ax = plt.axes(projection='3d')
+
+# Data for a three-dimensional line
+z = np.linspace(0, 15, 1000)
+x = np.sin(z)
+y = np.cos(z)
+ax.plot3D(x, y, z, 'green')
+
+ax.view_init(elevation, azimuth)
+
+st.pyplot(fig)
+

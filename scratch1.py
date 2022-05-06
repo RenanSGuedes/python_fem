@@ -7,7 +7,7 @@ from pylatex import Document, Section, Subsection, Math, Matrix, NoEscape, Subsu
 
 x = symbols("x")
 
-fis, Ls, Es, As = [], [], [], []
+fis, Ls, Es, As, points, elements = [], [], [], [], [], []
 x1, y1 = 1, 0
 
 n_elementos = int(input("n_elementos: "))
@@ -32,6 +32,13 @@ for i in range(n_elementos):
     xp2s.append(xp2)
     yp2s.append(yp2)
 
+    if [xp1, yp1] not in points:
+        points.append([xp1, yp1])
+    if [xp2, yp2] not in points:
+        points.append([xp2, yp2])
+
+    elements.append([[xp1, yp1, 0], [xp2, yp2, 0]])
+
     comprimento = ((xp2 - xp1) ** 2 + (yp2 - yp1) ** 2) ** .5
 
     vvs.append([xp2 - xp1, yp2 - yp1])
@@ -41,6 +48,8 @@ for i in range(n_elementos):
 
 print(90 * "-")
 print("vvs:", vvs)
+print("points:", points)
+print("elements:", elements)
 
 for i in range(len(vvs)):
     cosAlpha = (x1 * vvs[i][0] + y1 * vvs[i][1]) / (

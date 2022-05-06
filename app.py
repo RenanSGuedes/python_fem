@@ -2,21 +2,18 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 from sympy import pi, sin, cos, symbols, acos
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-import array_to_latex as a2l
-from mpl_toolkits.mplot3d import axes3d
 
 
-def bmatrix(a):
+def bmatrix(par):
     """Returns a LaTeX bmatrix
 
     :a: numpy array
     :returns: LaTeX bmatrix as a string
     """
-    if len(a.shape) > 2:
+    if len(par.shape) > 2:
         raise ValueError('bmatrix can at most display two dimensions')
-    lines = str(a).replace('[', '').replace(']', '').splitlines()
+    lines = str(par).replace('[', '').replace(']', '').splitlines()
     rv = [r'\begin{bmatrix}']
     rv += ['  ' + ' & '.join(l.split()) + r'\\' for l in lines]
     rv += [r'\end{bmatrix}']
@@ -25,7 +22,7 @@ def bmatrix(a):
 
 x = symbols("x")
 
-fis, Ls, Es, As = [], [], [], []
+fis, Ls, Es, As, points, elements = [], [], [], [], [], []
 x1, y1 = 1, 0
 
 vvs = []
@@ -69,32 +66,32 @@ for i in range(int(n_elementos)):
             with st.expander("Elemento {}".format(i + 1)):
                 st.subheader("Elemento {}".format(i + 1))
                 xp1, yp1 = st.text_input('x(p1)',
-                                         value="0",
+                                         value="{}".format(i + 1),
                                          key='x_key{}'.format(i),
                                          placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                             value="0",
+                                                                             value="{}".format(i + 2),
                                                                              key='x_key{}'.format(i),
                                                                              type="default",
                                                                              placeholder='y(p1)'),
 
                 xp2, yp2, Ei, D = [
                     st.text_input('x(p2)',
-                                  value="0",
+                                  value="{}".format(i + 3),
                                   key='x_key{}'.format(i),
                                   placeholder='x(p2)',
                                   disabled=False),
                     st.text_input('y(p2)',
-                                  value="0",
+                                  value="{}".format(i + 4),
                                   key='x_key{}'.format(i),
                                   placeholder='y(p2)',
                                   disabled=False),
                     st.text_input('Ei',
-                                  value="0",
+                                  value="30000000",
                                   key='x_key{}'.format(i),
                                   placeholder='Módulo de elasticidade',
                                   disabled=False),
                     st.text_input('D',
-                                  value="0",
+                                  value="0.25",
                                   key='x_key{}'.format(i),
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
@@ -104,32 +101,32 @@ for i in range(int(n_elementos)):
             with st.expander("Elemento {}".format(i + 1)):
                 st.subheader("Elemento {}".format(i + 1))
                 xp1, yp1 = st.text_input('x(p1)',
-                                         value="0",
+                                         value="{}".format(i + 1),
                                          key='x_key{}'.format(i),
                                          placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                             value="0",
+                                                                             value="{}".format(i + 2),
                                                                              key='x_key{}'.format(i),
                                                                              type="default",
                                                                              placeholder='y(p1)'),
 
                 xp2, yp2, Ei, D = [
                     st.text_input('x(p2)',
-                                  value="0",
+                                  value="{}".format(i + 3),
                                   key='x_key{}'.format(i),
                                   placeholder='x(p2)',
                                   disabled=False),
                     st.text_input('y(p2)',
-                                  value="0",
+                                  value="{}".format(i + 4),
                                   key='x_key{}'.format(i),
                                   placeholder='y(p2)',
                                   disabled=False),
                     st.text_input('Ei',
-                                  value="0",
+                                  value="30000000",
                                   key='x_key{}'.format(i),
                                   placeholder='Módulo de elasticidade',
                                   disabled=False),
                     st.text_input('D',
-                                  value="0",
+                                  value="0.25",
                                   key='x_key{}'.format(i),
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
@@ -139,6 +136,13 @@ for i in range(int(n_elementos)):
     yp1s.append(float(yp1))
     xp2s.append(float(xp2))
     yp2s.append(float(yp2))
+
+    if [xp1, yp1] not in points:
+        points.append([xp1, yp1, 0])
+    if [xp2, yp2] not in points:
+        points.append([xp2, yp2, 0])
+
+    elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
 
     comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
 
@@ -302,19 +306,154 @@ st.latex("K={}".format(
 
 # -------------------------------
 
-elevation = st.slider('Rotação 1', 0, 90, 0)
-azimuth = st.slider('Rotação 2', 0, 360, 0)
+elevation = st.slider('Elevação', 0, 90, 90)
+azimuth = st.slider('Azimute', 0, 360, 0)
 
-fig = plt.figure(figsize=(8, 8))
-ax = plt.axes(projection='3d')
+fig = plt.figure(facecolor='white')
+ax = fig.add_subplot(111, projection="3d")
 
-# Data for a three-dimensional line
-z = np.linspace(0, 15, 1000)
-x = np.sin(z)
-y = np.cos(z)
-ax.plot3D(x, y, z, 'green')
+for i in range(len(elements)):
+    xs, ys, zs = zip(elements[i][0], elements[i][1])
+    ax.plot(xs, ys, zs, color="blue", linewidth='3')
+
+for i in range(len(points)):
+    ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+
+ax.set_xlim(-2, 13)
+ax.set_ylim(-2, 13)
+ax.set_zlim(-2, 13)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
+
+ax.grid(False)
 
 ax.view_init(elevation, azimuth)
 
 st.pyplot(fig)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+n_elementos_matriz_de_forcas = 2 * coords
+
+forcas = []
+
+for i in range(int(coords)):
+    if i % 2 == 0:
+        with col1:
+            with st.expander("Nó {}".format(i + 1)):
+                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i))
+
+                if resposta == 'X':
+                    novaResposta = st.number_input(
+                        "Fy",
+                        min_value=0,
+                        max_value=100,
+                        value=0,
+                        key="nr{}".format(i),
+                    )
+                    forcas.append(['u{}:'.format(i + 1), 0])
+                    forcas.append(['v{}:'.format(i + 1), novaResposta])
+                elif resposta == 'Y':
+                    novaResposta = st.number_input(
+                        "Fx",
+                        min_value=0,
+                        max_value=100,
+                        value=0,
+                        key="nr{}".format(i),
+                    )
+                    forcas.append(['u{}:'.format(i + 1), novaResposta])
+                    forcas.append(['v{}:'.format(i + 1), 0])
+                elif resposta == 'XY':
+                    for j in (['u', 'v']):
+                        forcas.append(['{}{}'.format(j, i + 1), 'R'])
+                else:
+                    for (m, n) in zip(['x', 'y'], ['u', 'v']):
+                        novaResposta = st.number_input(
+                            "F{}".format(m),
+                            min_value=0,
+                            max_value=100,
+                            value=0,
+                            key="nr{}".format(i),
+                        )
+                        forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+    else:
+        with col2:
+            with st.expander("Nó {}".format(i + 1)):
+                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i))
+
+                if resposta == 'X':
+                    novaResposta = st.number_input(
+                        "Fy",
+                        min_value=0,
+                        max_value=100,
+                        value=0,
+                        key="nr{}".format(i),
+                    )
+                    forcas.append(['u{}:'.format(i + 1), 0])
+                    forcas.append(['v{}:'.format(i + 1), novaResposta])
+                elif resposta == 'Y':
+                    novaResposta = st.number_input(
+                        "Fx",
+                        min_value=0,
+                        max_value=100,
+                        value=0,
+                        key="nr{}".format(i),
+                    )
+                    forcas.append(['u{}:'.format(i + 1), novaResposta])
+                    forcas.append(['v{}:'.format(i + 1), 0])
+                elif resposta == 'XY':
+                    for j in (['u', 'v']):
+                        forcas.append(['{}{}'.format(j, i + 1), 'R'])
+                else:
+                    for (m, n) in zip(['x', 'y'], ['u', 'v']):
+                        novaResposta = st.number_input(
+                            "F{}".format(m),
+                            min_value=0,
+                            max_value=100,
+                            value=0,
+                            key="nr{}".format(i),
+                        )
+                        forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+
+forcasFiltradoComUeV = []
+forcasFiltrado = []
+
+for i in range(int(len(forcas))):
+    if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
+        forcasFiltradoComUeV.append(forcas[i])
+
+for i in range(int(len(forcas))):
+    if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
+        forcasFiltrado.append(forcas[i][1])
+
+st.write('forcas = {}'.format(forcas))
+st.write('forcasFiltradoComUeV = {}'.format(forcasFiltradoComUeV))
+st.write('forcasFiltrado = {}'.format(forcasFiltrado))
+
+st.write(np.array(forcasFiltrado))
+
+ccs = []
+
+for item in forcas:
+    if item[1] == 'R':
+        ccs.append(forcas.index(item))
+
+a = np.delete(listaGlobalNumpy, ccs, axis=1)
+a = np.delete(a, ccs, axis=0)
+
+numpyListInverse = np.linalg.inv(a)
+
+deslocamentosNumpy = np.matmul(numpyListInverse, forcasFiltrado)
+deslocamentosArray = deslocamentosNumpy.tolist()
+
+st.write("deslocamentosArray", deslocamentosArray)
+
+deslocamentosComUeV = []
+
+
+for i in range(len(forcasFiltradoComUeV)):
+    deslocamentosComUeV.append(('{}'.format(forcasFiltradoComUeV[i][0]), deslocamentosArray[i]))
+
+st.write("deslocamentosComUeV", deslocamentosComUeV)
 

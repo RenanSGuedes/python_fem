@@ -318,25 +318,11 @@ for i in range(int(coords)):
                 resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i))
 
                 if resposta == 'X':
-                    novaResposta = st.number_input(
-                        "Fy",
-                        min_value=0,
-                        max_value=100,
-                        value=0,
-                        key="nr{}".format(i),
-                    )
-                    forcas.append(['u{}:'.format(i + 1), 0])
-                    forcas.append(['v{}:'.format(i + 1), novaResposta])
-                elif resposta == 'Y':
-                    novaResposta = st.number_input(
-                        "Fx",
-                        min_value=0,
-                        max_value=100,
-                        value=0,
-                        key="nr{}".format(i),
-                    )
-                    forcas.append(['u{}:'.format(i + 1), novaResposta])
+                    forcas.append(['u{}:'.format(i + 1), "R"])
                     forcas.append(['v{}:'.format(i + 1), 0])
+                elif resposta == 'Y':
+                    forcas.append(['u{}:'.format(i + 1), 0])
+                    forcas.append(['v{}:'.format(i + 1), "R"])
                 elif resposta == 'XY':
                     for j in (['u', 'v']):
                         forcas.append(['{}{}'.format(j, i + 1), 'R'])
@@ -344,7 +330,7 @@ for i in range(int(coords)):
                     for (m, n) in zip(['x', 'y'], ['u', 'v']):
                         novaResposta = st.number_input(
                             "F{}".format(m),
-                            min_value=0,
+                            min_value=-100,
                             max_value=100,
                             value=0,
                             key="nr{}".format(i),
@@ -356,25 +342,11 @@ for i in range(int(coords)):
                 resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i))
 
                 if resposta == 'X':
-                    novaResposta = st.number_input(
-                        "Fy",
-                        min_value=0,
-                        max_value=100,
-                        value=0,
-                        key="nr{}".format(i),
-                    )
-                    forcas.append(['u{}:'.format(i + 1), 0])
-                    forcas.append(['v{}:'.format(i + 1), novaResposta])
-                elif resposta == 'Y':
-                    novaResposta = st.number_input(
-                        "Fx",
-                        min_value=0,
-                        max_value=100,
-                        value=0,
-                        key="nr{}".format(i),
-                    )
-                    forcas.append(['u{}:'.format(i + 1), novaResposta])
+                    forcas.append(['u{}:'.format(i + 1), "R"])
                     forcas.append(['v{}:'.format(i + 1), 0])
+                elif resposta == 'Y':
+                    forcas.append(['u{}:'.format(i + 1), 0])
+                    forcas.append(['v{}:'.format(i + 1), "R"])
                 elif resposta == 'XY':
                     for j in (['u', 'v']):
                         forcas.append(['{}{}'.format(j, i + 1), 'R'])
@@ -382,7 +354,7 @@ for i in range(int(coords)):
                     for (m, n) in zip(['x', 'y'], ['u', 'v']):
                         novaResposta = st.number_input(
                             "F{}".format(m),
-                            min_value=0,
+                            min_value=-100,
                             max_value=100,
                             value=0,
                             key="nr{}".format(i),
@@ -412,19 +384,30 @@ a = np.delete(a, ccs, axis=0)
 numpyListInverse = np.linalg.inv(a)
 
 deslocamentosNumpy = np.matmul(numpyListInverse, forcasFiltrado)
-deslocamentosArray = deslocamentosNumpy.tolist()
 
+deslocamentosArray = deslocamentosNumpy.tolist()
 deslocamentosComUeV = []
 
 for i in range(len(forcasFiltradoComUeV)):
     deslocamentosComUeV.append(('{}'.format(forcasFiltradoComUeV[i][0]), deslocamentosArray[i]))
 
-for i in range(0, len(deslocamentosComUeV), 2):
-    deslocamentosAgrupados.append(
-        [int(list(deslocamentosComUeV[i][0])[1]), deslocamentosComUeV[i][1], deslocamentosComUeV[i + 1][1]])
+for i in range(len(forcas)):
+    for j in range(len(deslocamentosComUeV)):
+        if forcas[i][1] == 'R':
+            forcas[i][1] = 0
+        elif forcas[i][0] == deslocamentosComUeV[j][0]:
+            forcas[i][1] = deslocamentosComUeV[j][1]
 
-st.write("deslocamentosAgrupados:", deslocamentosAgrupados)
-st.write("elementsComNos:", elementsComNos)
+for i in range(0, len(forcas) - 1, 2):
+    if list(forcas[i][0])[0] == 'u' and list(forcas[i + 1][0])[0] == 'v':
+        deslocamentosAgrupados.append(
+            [int(list(forcas[i][0])[1]), forcas[i][1], forcas[i + 1][1]])
+    elif list(forcas[i][0])[0] == 'v':
+        deslocamentosAgrupados.append(
+            [int(list(forcas[i][0])[1]), 0, forcas[i + 1][1]])
+    else:
+        deslocamentosAgrupados.append(
+            [int(list(forcas[i][0])[1]), forcas[i][1], 0])
 
 for i in range(len(elementsComNos)):
     for j in range(len(deslocamentosAgrupados)):
@@ -448,7 +431,7 @@ newElements = elementsComNos
 # ----------------------------------------------------------------------------------------------------
 
 elevation = st.slider('Elevação', 0, 90, 90)
-azimuth = st.slider('Azimute', 0, 360, 0)
+azimuth = st.slider('Azimute', 0, 360, 270)
 
 fig = plt.figure(facecolor='white')
 ax = fig.add_subplot(111, projection="3d")
@@ -457,16 +440,16 @@ for i in range(len(elements)):
     xs, ys, zs = zip(elements[i][0], elements[i][1])
     ax.plot(xs, ys, zs, color="blue", linewidth='3')
 
+for i in range(len(points)):
+    ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+
 for i in range(len(newElements)):
     xs, ys, zs = zip(newElements[i][0], newElements[i][1])
     ax.plot(xs, ys, zs, color="red", linewidth='3')
 
-for i in range(len(points)):
-    ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
-
-ax.set_xlim(-2, 13)
-ax.set_ylim(-2, 13)
-ax.set_zlim(-2, 13)
+ax.set_xlim(-2, 24)
+ax.set_ylim(-2, 24)
+ax.set_zlim(-2, 24)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")

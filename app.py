@@ -22,7 +22,16 @@ def bmatrix(par):
 
 x = symbols("x")
 
-fis, Ls, Es, As, points, elements = [], [], [], [], [], []
+fis, Ls, Es, As, points, elements, elementsComNos, indicesElementos, deslocamentosAgrupados = [], \
+                                                                                              [], \
+                                                                                              [], \
+                                                                                              [], \
+                                                                                              [], \
+                                                                                              [], \
+                                                                                              [], \
+                                                                                              [], \
+                                                                                              []
+
 x1, y1 = 1, 0
 
 vvs = []
@@ -96,6 +105,19 @@ for i in range(int(n_elementos)):
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
                 ]
+                n1 = st.number_input('n1',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n1_{}'.format(i))
+
+                n2 = st.number_input('n2',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n2_{}'.format(i))
     else:
         with col2:
             with st.expander("Elemento {}".format(i + 1)):
@@ -131,6 +153,19 @@ for i in range(int(n_elementos)):
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
                 ]
+                n1 = st.number_input('n1',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n1_{}'.format(i))
+
+                n2 = st.number_input('n2',
+                                     min_value=1,
+                                     max_value=int(coords),
+                                     value=1,
+                                     step=1,
+                                     key='id_n2_{}'.format(i))
 
     xp1s.append(float(xp1))
     yp1s.append(float(yp1))
@@ -143,7 +178,8 @@ for i in range(int(n_elementos)):
         points.append([xp2, yp2, 0])
 
     elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
-
+    indicesElementos.append([n1, n2])
+    elementsComNos.append([[n1, float(xp1), float(yp1)], [n2, float(xp2), float(yp2)]])
     comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
 
     vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
@@ -234,46 +270,7 @@ for i in range(int(coords)):
     linha.append(i + 1)
     linha.append(i + 1)
 
-indicesElementos = []
 # indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
-
-for i in range(int(n_elementos)):
-    if i % 2 == 0:
-        with col1:
-            with st.expander("Elemento {}".format(i + 1)):
-                n1 = st.number_input('n1',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=1,
-                                     step=1,
-                                     key='id_n1_{}'.format(i))
-
-                n2 = st.number_input('n2',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=1,
-                                     step=1,
-                                     key='id_n2_{}'.format(i))
-
-                indicesElementos.append([n1, n2])
-    else:
-        with col2:
-            with st.expander("Elemento {}".format(i + 1)):
-                n1 = st.number_input('n1',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=1,
-                                     step=1,
-                                     key='id_n1_{}'.format(i))
-
-                n2 = st.number_input('n2',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=1,
-                                     step=1,
-                                     key='id_n2_{}'.format(i))
-
-                indicesElementos.append([n1, n2])
 
 indices = []
 
@@ -306,31 +303,7 @@ st.latex("K={}".format(
 
 # -------------------------------
 
-elevation = st.slider('Elevação', 0, 90, 90)
-azimuth = st.slider('Azimute', 0, 360, 0)
-
-fig = plt.figure(facecolor='white')
-ax = fig.add_subplot(111, projection="3d")
-
-for i in range(len(elements)):
-    xs, ys, zs = zip(elements[i][0], elements[i][1])
-    ax.plot(xs, ys, zs, color="blue", linewidth='3')
-
-for i in range(len(points)):
-    ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
-
-ax.set_xlim(-2, 13)
-ax.set_ylim(-2, 13)
-ax.set_zlim(-2, 13)
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("z")
-
-ax.grid(False)
-
-ax.view_init(elevation, azimuth)
-
-st.pyplot(fig)
+# PLOT ANTERIOR
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -427,12 +400,6 @@ for i in range(int(len(forcas))):
     if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
         forcasFiltrado.append(forcas[i][1])
 
-st.write('forcas = {}'.format(forcas))
-st.write('forcasFiltradoComUeV = {}'.format(forcasFiltradoComUeV))
-st.write('forcasFiltrado = {}'.format(forcasFiltrado))
-
-st.write(np.array(forcasFiltrado))
-
 ccs = []
 
 for item in forcas:
@@ -447,13 +414,65 @@ numpyListInverse = np.linalg.inv(a)
 deslocamentosNumpy = np.matmul(numpyListInverse, forcasFiltrado)
 deslocamentosArray = deslocamentosNumpy.tolist()
 
-st.write("deslocamentosArray", deslocamentosArray)
-
 deslocamentosComUeV = []
-
 
 for i in range(len(forcasFiltradoComUeV)):
     deslocamentosComUeV.append(('{}'.format(forcasFiltradoComUeV[i][0]), deslocamentosArray[i]))
 
-st.write("deslocamentosComUeV", deslocamentosComUeV)
+for i in range(0, len(deslocamentosComUeV), 2):
+    deslocamentosAgrupados.append(
+        [int(list(deslocamentosComUeV[i][0])[1]), deslocamentosComUeV[i][1], deslocamentosComUeV[i + 1][1]])
 
+st.write("deslocamentosAgrupados:", deslocamentosAgrupados)
+st.write("elementsComNos:", elementsComNos)
+
+for i in range(len(elementsComNos)):
+    for j in range(len(deslocamentosAgrupados)):
+        for k in range(2):
+            if elementsComNos[i][k][0] == deslocamentosAgrupados[j][0]:
+                elementsComNos[i][k][1] += deslocamentosAgrupados[j][1]
+                elementsComNos[i][k][2] += deslocamentosAgrupados[j][2]
+
+# Deleta os índices da primeira posição usados como referência
+for i in range(len(elementsComNos)):
+    for j in range(2):
+        del elementsComNos[i][j][0]
+
+# Acrescenta o 0 da terceira coordenada para a plotagem em 3D
+for i in range(len(elementsComNos)):
+    for j in range(2):
+        elementsComNos[i][j].append(0)
+
+newElements = elementsComNos
+
+# ----------------------------------------------------------------------------------------------------
+
+elevation = st.slider('Elevação', 0, 90, 90)
+azimuth = st.slider('Azimute', 0, 360, 0)
+
+fig = plt.figure(facecolor='white')
+ax = fig.add_subplot(111, projection="3d")
+
+for i in range(len(elements)):
+    xs, ys, zs = zip(elements[i][0], elements[i][1])
+    ax.plot(xs, ys, zs, color="blue", linewidth='3')
+
+for i in range(len(newElements)):
+    xs, ys, zs = zip(newElements[i][0], newElements[i][1])
+    ax.plot(xs, ys, zs, color="red", linewidth='3')
+
+for i in range(len(points)):
+    ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+
+ax.set_xlim(-2, 13)
+ax.set_ylim(-2, 13)
+ax.set_zlim(-2, 13)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
+
+ax.grid(False)
+
+ax.view_init(elevation, azimuth)
+
+st.pyplot(fig)

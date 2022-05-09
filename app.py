@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 from PIL import Image
 import numpy as np
@@ -459,3 +460,43 @@ ax.grid(False)
 ax.view_init(elevation, azimuth)
 
 st.pyplot(fig)
+
+# -----------------------------------------------------------------------------------------------------------
+
+rows = []
+xp1s, yp1s, xp2s, yp2s, Es, Ds, As = [], [], [], [], [], [], []
+indicesElementos = []
+
+uploaded_file = st.file_uploader("Choose a file")
+if uploaded_file is not None:
+    # To read file as bytes:
+    bytes_data = uploaded_file.getvalue()
+    st.write(bytes_data)
+
+    # Can be used wherever a "file-like" object is accepted:
+    dataframe = pd.read_csv(uploaded_file)
+    st.write(dataframe)
+
+    pandasToPythonList = dataframe.values.tolist()
+
+    for row in pandasToPythonList:
+        rows.append(row)
+
+    for i in range(len(rows)):
+
+        xp1s.append(rows[i][0])
+        yp1s.append(rows[i][1])
+        xp2s.append(rows[i][2])
+        yp2s.append(rows[i][3])
+        Es.append(rows[i][4])
+        As.append(float(pi/4*rows[i][5]**2))
+        indicesElementos.append([rows[i][6], rows[i][7]])
+
+    st.write(xp1s)
+    st.write(yp1s)
+    st.write(xp2s)
+    st.write(yp2s)
+    st.write(Es)
+    st.write(As)
+    st.write(indicesElementos)
+

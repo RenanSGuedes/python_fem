@@ -35,6 +35,7 @@ fis, Ls, Es, As, points, elements, elementsComNos, indicesElementos, deslocament
 
 x1, y1 = 1, 0
 
+rows = []
 vvs = []
 
 xp1s, yp1s, xp2s, yp2s = [], [], [], []
@@ -70,38 +71,53 @@ with col2:
                              step=1,
                              key='id_coords')
 
+
+uploaded_file = st.file_uploader("Escolha um arquivo")
+if uploaded_file is not None:
+    # To read file as bytes:
+    bytes_data = uploaded_file.getvalue()
+
+    # Can be used wherever a "file-like" object is accepted:
+    dataframe = pd.read_csv(uploaded_file)
+
+    pandasToPythonList = dataframe.values.tolist()
+
+    for row in pandasToPythonList:
+        rows.append(row)
+
+
 for i in range(int(n_elementos)):
     if i % 2 == 0:
         with col1:
             with st.expander("Elemento {}".format(i + 1)):
                 st.subheader("Elemento {}".format(i + 1))
                 xp1, yp1 = st.text_input('x(p1)',
-                                         value="{}".format(i + 1),
+                                         value="{}".format(rows[i][0]),
                                          key='x_key{}'.format(i),
                                          placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                             value="{}".format(i + 2),
+                                                                             value="{}".format(rows[i][1]),
                                                                              key='x_key{}'.format(i),
                                                                              type="default",
                                                                              placeholder='y(p1)'),
 
                 xp2, yp2, Ei, D = [
                     st.text_input('x(p2)',
-                                  value="{}".format(i + 3),
+                                  value="{}".format(rows[i][2]),
                                   key='x_key{}'.format(i),
                                   placeholder='x(p2)',
                                   disabled=False),
                     st.text_input('y(p2)',
-                                  value="{}".format(i + 4),
+                                  value="{}".format(rows[i][3]),
                                   key='x_key{}'.format(i),
                                   placeholder='y(p2)',
                                   disabled=False),
                     st.text_input('Ei',
-                                  value="30000000",
+                                  value="{}".format(rows[i][4]),
                                   key='x_key{}'.format(i),
                                   placeholder='Módulo de elasticidade',
                                   disabled=False),
                     st.text_input('D',
-                                  value="0.25",
+                                  value="{}".format(rows[i][5]),
                                   key='x_key{}'.format(i),
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
@@ -109,14 +125,14 @@ for i in range(int(n_elementos)):
                 n1 = st.number_input('n1',
                                      min_value=1,
                                      max_value=int(coords),
-                                     value=1,
+                                     value=int(rows[i][6]),
                                      step=1,
                                      key='id_n1_{}'.format(i))
 
                 n2 = st.number_input('n2',
                                      min_value=1,
                                      max_value=int(coords),
-                                     value=1,
+                                     value=int(rows[i][7]),
                                      step=1,
                                      key='id_n2_{}'.format(i))
     else:
@@ -124,32 +140,32 @@ for i in range(int(n_elementos)):
             with st.expander("Elemento {}".format(i + 1)):
                 st.subheader("Elemento {}".format(i + 1))
                 xp1, yp1 = st.text_input('x(p1)',
-                                         value="{}".format(i + 1),
+                                         value="{}".format(rows[i][0]),
                                          key='x_key{}'.format(i),
                                          placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                             value="{}".format(i + 2),
+                                                                             value="{}".format(rows[i][1]),
                                                                              key='x_key{}'.format(i),
                                                                              type="default",
                                                                              placeholder='y(p1)'),
 
                 xp2, yp2, Ei, D = [
                     st.text_input('x(p2)',
-                                  value="{}".format(i + 3),
+                                  value="{}".format(rows[i][2]),
                                   key='x_key{}'.format(i),
                                   placeholder='x(p2)',
                                   disabled=False),
                     st.text_input('y(p2)',
-                                  value="{}".format(i + 4),
+                                  value="{}".format(rows[i][3]),
                                   key='x_key{}'.format(i),
                                   placeholder='y(p2)',
                                   disabled=False),
                     st.text_input('Ei',
-                                  value="30000000",
+                                  value="{}".format(rows[i][4]),
                                   key='x_key{}'.format(i),
                                   placeholder='Módulo de elasticidade',
                                   disabled=False),
                     st.text_input('D',
-                                  value="0.25",
+                                  value="{}".format(rows[i][5]),
                                   key='x_key{}'.format(i),
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
@@ -157,14 +173,14 @@ for i in range(int(n_elementos)):
                 n1 = st.number_input('n1',
                                      min_value=1,
                                      max_value=int(coords),
-                                     value=1,
+                                     value=int(rows[i][6]),
                                      step=1,
                                      key='id_n1_{}'.format(i))
 
                 n2 = st.number_input('n2',
                                      min_value=1,
                                      max_value=int(coords),
-                                     value=1,
+                                     value=int(rows[i][7]),
                                      step=1,
                                      key='id_n2_{}'.format(i))
 
@@ -203,54 +219,55 @@ for i in range(len(vvs)):
 
 lista = []
 
-st.header("Matriz de rigidez de cada elemento")
-image = Image.open('./images/truss.png')
-st.image(image, use_column_width=True)
-for i in range(len(fis)):
-    fi = float(fis[i] * pi / 180)
-    E = float(Es[i])
-    A = float(As[i])
-    L = float(Ls[i])
+with st.expander("Matriz de rigidez de cada elemento"):
+    st.header("Matriz de rigidez de cada elemento")
+    image = Image.open('./images/truss.png')
+    st.image(image, use_column_width=True)
+    for i in range(len(fis)):
+        fi = float(fis[i] * pi / 180)
+        E = float(Es[i])
+        A = float(As[i])
+        L = float(Ls[i])
 
-    cte = E * A / L * .001
+        cte = E * A / L * .001
 
-    aA = cte * (cos(x) ** 2).subs(x, fi)
-    bB = cte * (cos(x) * sin(x)).subs(x, fi)
-    cC = cte * (-cos(x) ** 2).subs(x, fi)
-    dD = cte * (-cos(x) * sin(x)).subs(x, fi)
-    eE = cte * (cos(x) * sin(x)).subs(x, fi)
-    fF = cte * (sin(x) ** 2).subs(x, fi)
-    gG = cte * (-cos(x) * sin(x)).subs(x, fi)
-    hH = cte * (-sin(x) ** 2).subs(x, fi)
-    iI = cte * (-cos(x) ** 2).subs(x, fi)
-    jJ = cte * (-cos(x) * sin(x)).subs(x, fi)
-    kK = cte * (cos(x) ** 2).subs(x, fi)
-    lL = cte * (cos(x) * sin(x)).subs(x, fi)
-    mM = cte * (-cos(x) * sin(x)).subs(x, fi)
-    nN = cte * (-sin(x) ** 2).subs(x, fi)
-    oO = cte * (cos(x) * sin(x)).subs(x, fi)
-    pP = cte * (sin(x) ** 2).subs(x, fi)
+        aA = cte * (cos(x) ** 2).subs(x, fi)
+        bB = cte * (cos(x) * sin(x)).subs(x, fi)
+        cC = cte * (-cos(x) ** 2).subs(x, fi)
+        dD = cte * (-cos(x) * sin(x)).subs(x, fi)
+        eE = cte * (cos(x) * sin(x)).subs(x, fi)
+        fF = cte * (sin(x) ** 2).subs(x, fi)
+        gG = cte * (-cos(x) * sin(x)).subs(x, fi)
+        hH = cte * (-sin(x) ** 2).subs(x, fi)
+        iI = cte * (-cos(x) ** 2).subs(x, fi)
+        jJ = cte * (-cos(x) * sin(x)).subs(x, fi)
+        kK = cte * (cos(x) ** 2).subs(x, fi)
+        lL = cte * (cos(x) * sin(x)).subs(x, fi)
+        mM = cte * (-cos(x) * sin(x)).subs(x, fi)
+        nN = cte * (-sin(x) ** 2).subs(x, fi)
+        oO = cte * (cos(x) * sin(x)).subs(x, fi)
+        pP = cte * (sin(x) ** 2).subs(x, fi)
 
-    k = [
-        [aA, bB, cC, dD],
-        [eE, fF, gG, hH],
-        [iI, jJ, kK, lL],
-        [mM, nN, oO, pP]
-    ]
+        k = [
+            [aA, bB, cC, dD],
+            [eE, fF, gG, hH],
+            [iI, jJ, kK, lL],
+            [mM, nN, oO, pP]
+        ]
 
-    lista.append(k)
+        lista.append(k)
 
-    for n in range(len(k)):
-        for j in range(len(k)):
-            k[n][j] = float(format(float(k[n][j]), ".1f"))
+        for n in range(len(k)):
+            for j in range(len(k)):
+                k[n][j] = float(format(float(k[n][j]), ".1f"))
 
-    kLaTeXForm = np.array(k)
+        kLaTeXForm = np.array(k)
 
-    st.subheader('Matrix de rigidez do elemento {}'.format(i + 1))
-    st.latex("k_{}={}".format(
-        i + 1,
-        bmatrix(kLaTeXForm)
-    ))
+        st.subheader('Matrix de rigidez do elemento {}'.format(i + 1))
+        st.latex("k_{}={}".format(
+            i + 1,
+            bmatrix(kLaTeXForm)
+        ))
 
 # Define listaGlobal
 listaGlobal = []
@@ -295,12 +312,13 @@ for i in range(len(listaGlobal)):
 
 listaGlobalNumpy = np.array(listaGlobal)
 
-st.header('Matrix de rigidez global')
-image = Image.open('images/clock.png')
-st.image(image, use_column_width=True)
-st.latex("K={}".format(
-    bmatrix(listaGlobalNumpy)
-))
+with st.expander("Matriz de rigidez global"):
+    st.header('Matrix de rigidez global')
+    image = Image.open('images/clock.png')
+    st.image(image, use_column_width=True)
+    st.latex("K={}".format(
+        bmatrix(listaGlobalNumpy)
+    ))
 
 # -------------------------------
 
@@ -361,6 +379,7 @@ for i in range(int(coords)):
                             key="nr{}".format(i),
                         )
                         forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+
 
 forcasFiltradoComUeV = []
 forcasFiltrado = []
@@ -431,72 +450,36 @@ newElements = elementsComNos
 
 # ----------------------------------------------------------------------------------------------------
 
-elevation = st.slider('Elevação', 0, 90, 90)
-azimuth = st.slider('Azimute', 0, 360, 270)
+with st.expander("Gráfico"):
+    elevation = st.slider('Elevação', 0, 90, 90)
+    azimuth = st.slider('Azimute', 0, 360, 270)
 
-fig = plt.figure(facecolor='white')
-ax = fig.add_subplot(111, projection="3d")
+    fig = plt.figure(facecolor='white')
+    ax = fig.add_subplot(111, projection="3d")
 
-for i in range(len(elements)):
-    xs, ys, zs = zip(elements[i][0], elements[i][1])
-    ax.plot(xs, ys, zs, color="blue", linewidth='3')
+    for i in range(len(elements)):
+        xs, ys, zs = zip(elements[i][0], elements[i][1])
+        ax.plot(xs, ys, zs, color="blue", linewidth='3')
 
-for i in range(len(points)):
-    ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+    for i in range(len(points)):
+        ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
 
-for i in range(len(newElements)):
-    xs, ys, zs = zip(newElements[i][0], newElements[i][1])
-    ax.plot(xs, ys, zs, color="red", linewidth='3')
+    for i in range(len(newElements)):
+        xs, ys, zs = zip(newElements[i][0], newElements[i][1])
+        ax.plot(xs, ys, zs, color="red", linewidth='3')
 
-ax.set_xlim(-2, 24)
-ax.set_ylim(-2, 24)
-ax.set_zlim(-2, 24)
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("z")
+    ax.set_xlim(-2, 24)
+    ax.set_ylim(-2, 24)
+    ax.set_zlim(-2, 24)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
 
-ax.grid(False)
+    ax.grid(False)
 
-ax.view_init(elevation, azimuth)
+    ax.view_init(elevation, azimuth)
 
-st.pyplot(fig)
+    st.pyplot(fig)
 
 # -----------------------------------------------------------------------------------------------------------
-
-rows = []
-xp1s, yp1s, xp2s, yp2s, Es, Ds, As = [], [], [], [], [], [], []
-indicesElementos = []
-
-uploaded_file = st.file_uploader("Choose a file")
-if uploaded_file is not None:
-    # To read file as bytes:
-    bytes_data = uploaded_file.getvalue()
-    st.write(bytes_data)
-
-    # Can be used wherever a "file-like" object is accepted:
-    dataframe = pd.read_csv(uploaded_file)
-    st.write(dataframe)
-
-    pandasToPythonList = dataframe.values.tolist()
-
-    for row in pandasToPythonList:
-        rows.append(row)
-
-    for i in range(len(rows)):
-
-        xp1s.append(rows[i][0])
-        yp1s.append(rows[i][1])
-        xp2s.append(rows[i][2])
-        yp2s.append(rows[i][3])
-        Es.append(rows[i][4])
-        As.append(float(pi/4*rows[i][5]**2))
-        indicesElementos.append([rows[i][6], rows[i][7]])
-
-    st.write(xp1s)
-    st.write(yp1s)
-    st.write(xp2s)
-    st.write(yp2s)
-    st.write(Es)
-    st.write(As)
-    st.write(indicesElementos)
 

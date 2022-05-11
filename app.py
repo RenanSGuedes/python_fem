@@ -41,6 +41,8 @@ vvs = []
 
 xp1s, yp1s, xp2s, yp2s = [], [], [], []
 
+st.sidebar.write("Hello, world!")
+
 st.title('Método dos Elementos Finitos')
 image = Image.open('./struc.png')
 st.image(image, use_column_width=True)
@@ -73,71 +75,57 @@ for i in range(int(len(rows))):
         with col1:
             with st.expander("Elemento {}".format(i + 1)):
                 st.subheader("Elemento {}".format(i + 1))
-                xp1, yp1 = st.text_input('x(p1)',
-                                         value="{}".format(rows[i][0]),
-                                         key='x_key{}'.format(i),
-                                         placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                             value="{}".format(rows[i][1]),
-                                                                             key='x_key{}'.format(i),
-                                                                             type="default",
-                                                                             placeholder='y(p1)'),
-
-                xp2, yp2, Ei, D = [
-                    st.text_input('x(p2)',
-                                  value="{}".format(rows[i][2]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='x(p2)',
-                                  disabled=False),
-                    st.text_input('y(p2)',
-                                  value="{}".format(rows[i][3]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='y(p2)',
-                                  disabled=False),
-                    st.text_input('Ei',
-                                  value="{}".format(rows[i][4]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='Módulo de elasticidade',
-                                  disabled=False),
-                    st.text_input('D',
-                                  value="{}".format(rows[i][5]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='Diâmetro da barra',
-                                  disabled=False)
+                xp1, yp1, xp2, yp2, Ei, D = [
+                    st.number_input('x(p1) (m)',
+                                    value=rows[i][0],
+                                    key='x_key{}'.format(i)),
+                    st.number_input('y(p1) (m)',
+                                    value=rows[i][1],
+                                    key='x_key{}'.format(i)),
+                    st.number_input('x(p2) (m)',
+                                    value=rows[i][2],
+                                    key='x_key{}'.format(i),
+                                    disabled=False),
+                    st.number_input('y(p2) (m)',
+                                    value=rows[i][3],
+                                    key='x_key{}'.format(i),
+                                    disabled=False),
+                    st.number_input('Ei (N/m²)',
+                                    value=rows[i][4],
+                                    key='x_key{}'.format(i),
+                                    disabled=False),
+                    st.number_input('D (m)',
+                                    value=rows[i][5],
+                                    key='x_key{}'.format(i),
+                                    disabled=False)
                 ]
     else:
         with col2:
             with st.expander("Elemento {}".format(i + 1)):
                 st.subheader("Elemento {}".format(i + 1))
-                xp1, yp1 = st.text_input('x(p1)',
-                                         value="{}".format(rows[i][0]),
-                                         key='x_key{}'.format(i),
-                                         placeholder='x(p1)'), st.text_input('y(p1)',
-                                                                             value="{}".format(rows[i][1]),
-                                                                             key='x_key{}'.format(i),
-                                                                             type="default",
-                                                                             placeholder='y(p1)'),
-
-                xp2, yp2, Ei, D = [
-                    st.text_input('x(p2)',
-                                  value="{}".format(rows[i][2]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='x(p2)',
-                                  disabled=False),
-                    st.text_input('y(p2)',
-                                  value="{}".format(rows[i][3]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='y(p2)',
-                                  disabled=False),
-                    st.text_input('Ei',
-                                  value="{}".format(rows[i][4]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='Módulo de elasticidade',
-                                  disabled=False),
-                    st.text_input('D',
-                                  value="{}".format(rows[i][5]),
-                                  key='x_key{}'.format(i),
-                                  placeholder='Diâmetro da barra',
-                                  disabled=False)
+                xp1, yp1, xp2, yp2, Ei, D = [
+                    st.number_input('x(p1) (m)',
+                                    value=rows[i][0],
+                                    key='x_key{}'.format(i)),
+                    st.number_input('y(p1) (m)',
+                                    value=rows[i][1],
+                                    key='x_key{}'.format(i)),
+                    st.number_input('x(p2) (m)',
+                                    value=rows[i][2],
+                                    key='x_key{}'.format(i),
+                                    disabled=False),
+                    st.number_input('y(p2) (m)',
+                                    value=rows[i][3],
+                                    key='x_key{}'.format(i),
+                                    disabled=False),
+                    st.number_input('Ei (N/m²)',
+                                    value=rows[i][4],
+                                    key='x_key{}'.format(i),
+                                    disabled=False),
+                    st.number_input('D (m)',
+                                    value=rows[i][5],
+                                    key='x_key{}'.format(i),
+                                    disabled=False)
                 ]
 
     xp1s.append(float(xp1))
@@ -173,6 +161,7 @@ pontoNoAgrupado = []
 for i in range(len(pontoNo)):
     pontoNoAgrupado.append([pontoNo[i], i + 1])
 
+st.write("pontoNoAgrupado", pontoNoAgrupado)
 indicesElementos = copy.deepcopy(elements)
 
 for i in range(len(elements)):
@@ -210,7 +199,7 @@ with st.expander("Matriz de rigidez de cada elemento"):
         A = float(As[i])
         L = float(Ls[i])
 
-        cte = E * A / L * .001
+        cte = E * A / L
 
         aA = cte * (cos(x) ** 2).subs(x, fi)
         bB = cte * (cos(x) * sin(x)).subs(x, fi)
@@ -245,10 +234,10 @@ with st.expander("Matriz de rigidez de cada elemento"):
         kLaTeXForm = np.array(k)
 
         st.subheader('Matrix de rigidez do elemento {}'.format(i + 1))
-        st.latex("k_{}={}".format(
-            i + 1,
-            bmatrix(kLaTeXForm)
-        ))
+        st.latex(r'''
+            \textbf k_{}={}
+        '''.format("{}".format("{" + str(i + 1) + "}"), bmatrix(kLaTeXForm))
+                 )
 
 # Define listaGlobal
 listaGlobal = []
@@ -297,7 +286,9 @@ with st.expander("Matriz de rigidez global"):
     st.header('Matrix de rigidez global')
     image = Image.open('images/clock.png')
     st.image(image, use_column_width=True)
-    st.latex("K={}".format(
+    st.latex(r"""
+        \textbf K={}
+        """.format(
         bmatrix(listaGlobalNumpy)
     ))
 
@@ -330,8 +321,6 @@ for i in range(len(pontoNo)):
                     for (m, n) in zip(['x', 'y'], ['u', 'v']):
                         novaResposta = st.number_input(
                             "F{}".format(m),
-                            min_value=-100,
-                            max_value=100,
                             value=0,
                             key="nr{}".format(i),
                         )
@@ -354,8 +343,6 @@ for i in range(len(pontoNo)):
                     for (m, n) in zip(['x', 'y'], ['u', 'v']):
                         novaResposta = st.number_input(
                             "F{}".format(m),
-                            min_value=-100,
-                            max_value=100,
                             value=0,
                             key="nr{}".format(i),
                         )
@@ -409,6 +396,17 @@ for i in range(0, len(forcas) - 1, 2):
         deslocamentosAgrupados.append(
             [int(list(forcas[i][0])[1]), forcas[i][1], 0])
 
+st.write("deslocamentosAgrupados", deslocamentosAgrupados)
+
+containerDeslocamentos = st.container()
+
+with containerDeslocamentos.expander("Deslocamentos"):
+    for i in range(len(deslocamentosAgrupados)):
+        st.subheader("Nó {}".format(i + 1))
+        st.write("u{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][1], ".4f")))
+        st.write("v{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][2], ".4f")))
+
+
 for i in range(len(elementsComNos)):
     for j in range(len(deslocamentosAgrupados)):
         for k in range(2):
@@ -460,9 +458,16 @@ with st.expander("Gráfico"):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
             ax.plot(xs, ys, zs, color="red", linewidth='3')
 
-    ax.set_xlim(-2, 24)
-    ax.set_ylim(-2, 24)
-    ax.set_zlim(-2, 24)
+    xsMinMax, ysMinMax, zsMinMax = [], [], []
+    for i in range(len(newElements)):
+        for j in range(2):
+            xsMinMax.append(newElements[i][j][0])
+            ysMinMax.append(newElements[i][j][1])
+            zsMinMax.append(newElements[i][j][2])
+
+    ax.set_xlim(min(xsMinMax) - 2, max(xsMinMax) + 2)
+    ax.set_ylim(min(ysMinMax) - 2, max(ysMinMax) + 2)
+    ax.set_zlim(min(zsMinMax) - 2, max(zsMinMax) + 2)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
@@ -472,5 +477,7 @@ with st.expander("Gráfico"):
     ax.view_init(elevation, azimuth)
 
     st.pyplot(fig)
+
+    st.write(newElements)
 
 # -----------------------------------------------------------------------------------------------------------

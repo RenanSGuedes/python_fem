@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 from sympy import pi, sin, cos, symbols, acos
 import matplotlib.pyplot as plt
+import copy
 
 
 def bmatrix(par):
@@ -53,25 +54,6 @@ st.write('A primeira parte considera a quantidade de elementos e coordenadas pre
          'elementos representam a quantidade de barras da estrutura da treliça, enquanto que as coordenadas são os '
          'nós que ligam as barras entre si.')
 
-col1, col2 = st.columns(2)
-
-with col1:
-    n_elementos = st.number_input('Número de elementos',
-                                  min_value=1,
-                                  max_value=100,
-                                  value=1,
-                                  step=1,
-                                  key='id_n_elementos')
-
-with col2:
-    coords = st.number_input('Número de coordenadas',
-                             min_value=1,
-                             max_value=100,
-                             value=1,
-                             step=1,
-                             key='id_coords')
-
-
 uploaded_file = st.file_uploader("Escolha um arquivo")
 if uploaded_file is not None:
     # To read file as bytes:
@@ -85,8 +67,8 @@ if uploaded_file is not None:
     for row in pandasToPythonList:
         rows.append(row)
 
-
-for i in range(int(n_elementos)):
+col1, col2 = st.columns(2)
+for i in range(int(len(rows))):
     if i % 2 == 0:
         with col1:
             with st.expander("Elemento {}".format(i + 1)):
@@ -122,19 +104,6 @@ for i in range(int(n_elementos)):
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
                 ]
-                n1 = st.number_input('n1',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=int(rows[i][6]),
-                                     step=1,
-                                     key='id_n1_{}'.format(i))
-
-                n2 = st.number_input('n2',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=int(rows[i][7]),
-                                     step=1,
-                                     key='id_n2_{}'.format(i))
     else:
         with col2:
             with st.expander("Elemento {}".format(i + 1)):
@@ -170,19 +139,6 @@ for i in range(int(n_elementos)):
                                   placeholder='Diâmetro da barra',
                                   disabled=False)
                 ]
-                n1 = st.number_input('n1',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=int(rows[i][6]),
-                                     step=1,
-                                     key='id_n1_{}'.format(i))
-
-                n2 = st.number_input('n2',
-                                     min_value=1,
-                                     max_value=int(coords),
-                                     value=int(rows[i][7]),
-                                     step=1,
-                                     key='id_n2_{}'.format(i))
 
     xp1s.append(float(xp1))
     yp1s.append(float(yp1))
@@ -195,14 +151,39 @@ for i in range(int(n_elementos)):
         points.append([xp2, yp2, 0])
 
     elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
-    indicesElementos.append([n1, n2])
-    elementsComNos.append([[n1, float(xp1), float(yp1)], [n2, float(xp2), float(yp2)]])
     comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
 
     vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
     Ls.append(comprimento)
     Es.append(Ei)
     As.append(pi / 4 * float(D) ** 2)
+
+listaP, pontoNo = [], []
+
+for item in elements:
+    for j in range(2):
+        listaP.append(item[j])
+
+for i in range(len(listaP)):
+    if listaP[i] not in pontoNo:
+        pontoNo.append(listaP[i])
+
+pontoNoAgrupado = []
+
+for i in range(len(pontoNo)):
+    pontoNoAgrupado.append([pontoNo[i], i + 1])
+
+indicesElementos = copy.deepcopy(elements)
+
+for i in range(len(elements)):
+    for j in range(2):
+        for k in range(len(pontoNoAgrupado)):
+            if elements[i][j] == pontoNoAgrupado[k][0]:
+                indicesElementos[i][j] = pontoNoAgrupado[k][1]
+
+for i in range(len(indicesElementos)):
+    elementsComNos.append([[indicesElementos[i][0], elements[i][0][0], elements[i][0][1]],
+                           [indicesElementos[i][1], elements[i][1][0], elements[i][1][1]]])
 
 for i in range(len(vvs)):
     cosAlpha = (x1 * vvs[i][0] + y1 * vvs[i][1]) / (
@@ -273,18 +254,18 @@ with st.expander("Matriz de rigidez de cada elemento"):
 listaGlobal = []
 
 # Insere linhas em listaGlobal
-for i in range(2 * int(coords)):
+for i in range(2 * len(pontoNo)):
     listaGlobal.append([])
 
 # Insere zeros nas linhas de listaGlobal
-for i in range(2 * int(coords)):
-    for j in range(2 * int(coords)):
+for i in range(2 * len(pontoNo)):
+    for j in range(2 * len(pontoNo)):
         listaGlobal[i].append(0)
 
 # Cria uma lista com os índices duplos que servirão de referência aos índices do python
 linha = []
 
-for i in range(int(coords)):
+for i in range(len(pontoNo)):
     linha.append(i + 1)
     linha.append(i + 1)
 
@@ -292,7 +273,7 @@ for i in range(int(coords)):
 
 indices = []
 
-for i in range(int(n_elementos)):
+for i in range(len(rows)):
     indices.append([])
 
 for j in range(len(indicesElementos)):
@@ -326,15 +307,15 @@ with st.expander("Matriz de rigidez global"):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-n_elementos_matriz_de_forcas = 2 * coords
+n_elementos_matriz_de_forcas = 2 * len(pontoNo)
 
 forcas = []
 
-for i in range(int(coords)):
+for i in range(len(pontoNo)):
     if i % 2 == 0:
         with col1:
             with st.expander("Nó {}".format(i + 1)):
-                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i))
+                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
 
                 if resposta == 'X':
                     forcas.append(['u{}:'.format(i + 1), "R"])
@@ -358,7 +339,7 @@ for i in range(int(coords)):
     else:
         with col2:
             with st.expander("Nó {}".format(i + 1)):
-                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i))
+                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
 
                 if resposta == 'X':
                     forcas.append(['u{}:'.format(i + 1), "R"])
@@ -379,7 +360,6 @@ for i in range(int(coords)):
                             key="nr{}".format(i),
                         )
                         forcas.append(['{}{}'.format(n, i + 1), novaResposta])
-
 
 forcasFiltradoComUeV = []
 forcasFiltrado = []
@@ -457,16 +437,28 @@ with st.expander("Gráfico"):
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111, projection="3d")
 
-    for i in range(len(elements)):
-        xs, ys, zs = zip(elements[i][0], elements[i][1])
-        ax.plot(xs, ys, zs, color="blue", linewidth='3')
+    resposta = st.radio(
+        "Gráficos",
+        ('Estrutura', 'Estrutura + Deformação'))
 
-    for i in range(len(points)):
-        ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+    if resposta == 'Estrutura':
+        for i in range(len(elements)):
+            xs, ys, zs = zip(elements[i][0], elements[i][1])
+            ax.plot(xs, ys, zs, color="blue", linewidth='3')
 
-    for i in range(len(newElements)):
-        xs, ys, zs = zip(newElements[i][0], newElements[i][1])
-        ax.plot(xs, ys, zs, color="red", linewidth='3')
+        for i in range(len(points)):
+            ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+    else:
+        for i in range(len(elements)):
+            xs, ys, zs = zip(elements[i][0], elements[i][1])
+            ax.plot(xs, ys, zs, color="blue", linewidth='3')
+
+        for i in range(len(points)):
+            ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+
+        for i in range(len(newElements)):
+            xs, ys, zs = zip(newElements[i][0], newElements[i][1])
+            ax.plot(xs, ys, zs, color="red", linewidth='3')
 
     ax.set_xlim(-2, 24)
     ax.set_ylim(-2, 24)
@@ -482,4 +474,3 @@ with st.expander("Gráfico"):
     st.pyplot(fig)
 
 # -----------------------------------------------------------------------------------------------------------
-

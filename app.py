@@ -161,7 +161,6 @@ pontoNoAgrupado = []
 for i in range(len(pontoNo)):
     pontoNoAgrupado.append([pontoNo[i], i + 1])
 
-st.write("pontoNoAgrupado", pontoNoAgrupado)
 indicesElementos = copy.deepcopy(elements)
 
 for i in range(len(elements)):
@@ -396,8 +395,6 @@ for i in range(0, len(forcas) - 1, 2):
         deslocamentosAgrupados.append(
             [int(list(forcas[i][0])[1]), forcas[i][1], 0])
 
-st.write("deslocamentosAgrupados", deslocamentosAgrupados)
-
 containerDeslocamentos = st.container()
 
 with containerDeslocamentos.expander("Deslocamentos"):
@@ -406,25 +403,58 @@ with containerDeslocamentos.expander("Deslocamentos"):
         st.write("u{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][1], ".4f")))
         st.write("v{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][2], ".4f")))
 
+newElements = copy.deepcopy(elementsComNos)
 
-for i in range(len(elementsComNos)):
+for i in range(len(newElements)):
     for j in range(len(deslocamentosAgrupados)):
         for k in range(2):
-            if elementsComNos[i][k][0] == deslocamentosAgrupados[j][0]:
-                elementsComNos[i][k][1] += deslocamentosAgrupados[j][1]
-                elementsComNos[i][k][2] += deslocamentosAgrupados[j][2]
+            if newElements[i][k][0] == deslocamentosAgrupados[j][0]:
+                newElements[i][k][1] += deslocamentosAgrupados[j][1]
+                newElements[i][k][2] += deslocamentosAgrupados[j][2]
 
 # Deleta os índices da primeira posição usados como referência
-for i in range(len(elementsComNos)):
+for i in range(len(newElements)):
     for j in range(2):
-        del elementsComNos[i][j][0]
+        del newElements[i][j][0]
 
 # Acrescenta o 0 da terceira coordenada para a plotagem em 3D
-for i in range(len(elementsComNos)):
+for i in range(len(newElements)):
     for j in range(2):
-        elementsComNos[i][j].append(0)
+        newElements[i][j].append(0)
 
-newElements = elementsComNos
+
+st.write("newElements", newElements)
+
+novoComprimento = []
+for i in range(len(newElements)):
+    for j in range(1):
+        comprimento = ((newElements[i][j][0] - newElements[i][j + 1][0]) ** 2 +
+                       (newElements[i][j][1] - newElements[i][j + 1][1]) ** 2) ** .5
+
+        novoComprimento.append(comprimento)
+
+st.write("novoComprimento", novoComprimento)
+
+deformacoes = []
+
+for i in range(len(novoComprimento)):
+    epsilon = (novoComprimento[i] - Ls[i])/Ls[i]
+
+    deformacoes.append(epsilon)
+
+st.write(deformacoes)
+
+tensoes = []
+
+for i in range(len(deformacoes)):
+    sigma = Es[i]*deformacoes[i]
+
+    tensoes.append(sigma)
+
+st.write("tensoes", tensoes)
+
+# Tensão nos elementos
+
 
 # ----------------------------------------------------------------------------------------------------
 
@@ -437,7 +467,7 @@ with st.expander("Gráfico"):
 
     resposta = st.radio(
         "Gráficos",
-        ('Estrutura', 'Estrutura + Deformação'))
+        ('Estrutura', 'Estrutura + Deformação', 'Estrutura + Tensões'))
 
     if resposta == 'Estrutura':
         for i in range(len(elements)):
@@ -446,7 +476,7 @@ with st.expander("Gráfico"):
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
-    else:
+    elif resposta == 'Estrutura + Deformação':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
             ax.plot(xs, ys, zs, color="blue", linewidth='3')
@@ -457,6 +487,15 @@ with st.expander("Gráfico"):
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
             ax.plot(xs, ys, zs, color="red", linewidth='3')
+    else:
+        for i in range(len(newElements)):
+            xs, ys, zs = zip(newElements[i][0], newElements[i][1])
+
+            if tensoes[i] < 0:
+                ax.plot(xs, ys, zs, color="blue", linewidth='3')
+
+            else:
+                ax.plot(xs, ys, zs, color="#FF5F5F", linewidth='3')
 
     xsMinMax, ysMinMax, zsMinMax = [], [], []
     for i in range(len(newElements)):
@@ -477,7 +516,5 @@ with st.expander("Gráfico"):
     ax.view_init(elevation, azimuth)
 
     st.pyplot(fig)
-
-    st.write(newElements)
 
 # -----------------------------------------------------------------------------------------------------------

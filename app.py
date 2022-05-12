@@ -4,6 +4,8 @@ from PIL import Image
 import numpy as np
 from sympy import pi, sin, cos, symbols, acos
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from mpl_toolkits.mplot3d import Axes3D
 import copy
 
 
@@ -24,15 +26,8 @@ def bmatrix(par):
 
 x = symbols("x")
 
-fis, Ls, Es, As, points, elements, elementsComNos, indicesElementos, deslocamentosAgrupados = [], \
-                                                                                              [], \
-                                                                                              [], \
-                                                                                              [], \
-                                                                                              [], \
-                                                                                              [], \
-                                                                                              [], \
-                                                                                              [], \
-                                                                                              []
+fis, Ls, Es, As, points, elements, elementsComNos, indicesElementos, Ds, deslocamentosAgrupados, = [], [], [], [], [], \
+                                                                                                   [], [], [], [], []
 
 x1, y1 = 1, 0
 
@@ -90,7 +85,7 @@ for i in range(int(len(rows))):
                                     value=rows[i][3],
                                     key='x_key{}'.format(i),
                                     disabled=False),
-                    st.number_input('Ei (N/m²)',
+                    st.number_input('E (N/m²)',
                                     value=rows[i][4],
                                     key='x_key{}'.format(i),
                                     disabled=False),
@@ -118,7 +113,7 @@ for i in range(int(len(rows))):
                                     value=rows[i][3],
                                     key='x_key{}'.format(i),
                                     disabled=False),
-                    st.number_input('Ei (N/m²)',
+                    st.number_input('E (N/m²)',
                                     value=rows[i][4],
                                     key='x_key{}'.format(i),
                                     disabled=False),
@@ -144,6 +139,7 @@ for i in range(int(len(rows))):
     vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
     Ls.append(comprimento)
     Es.append(Ei)
+    Ds.append(D)
     As.append(pi / 4 * float(D) ** 2)
 
 listaP, pontoNo = [], []
@@ -319,7 +315,7 @@ for i in range(len(pontoNo)):
                 else:
                     for (m, n) in zip(['x', 'y'], ['u', 'v']):
                         novaResposta = st.number_input(
-                            "F{}".format(m),
+                            "F{} (N)".format(m),
                             value=0,
                             key="nr{}".format(i),
                         )
@@ -341,7 +337,7 @@ for i in range(len(pontoNo)):
                 else:
                     for (m, n) in zip(['x', 'y'], ['u', 'v']):
                         novaResposta = st.number_input(
-                            "F{}".format(m),
+                            "F{} (N)".format(m),
                             value=0,
                             key="nr{}".format(i),
                         )
@@ -422,9 +418,6 @@ for i in range(len(newElements)):
     for j in range(2):
         newElements[i][j].append(0)
 
-
-st.write("newElements", newElements)
-
 novoComprimento = []
 for i in range(len(newElements)):
     for j in range(1):
@@ -433,28 +426,34 @@ for i in range(len(newElements)):
 
         novoComprimento.append(comprimento)
 
-st.write("novoComprimento", novoComprimento)
-
 deformacoes = []
 
 for i in range(len(novoComprimento)):
-    epsilon = (novoComprimento[i] - Ls[i])/Ls[i]
+    epsilon = (novoComprimento[i] - Ls[i]) / Ls[i]
 
     deformacoes.append(epsilon)
-
-st.write(deformacoes)
 
 tensoes = []
 
 for i in range(len(deformacoes)):
-    sigma = Es[i]*deformacoes[i]
+    sigma = Es[i] * deformacoes[i]
 
     tensoes.append(sigma)
 
-st.write("tensoes", tensoes)
+newPointsWithRep = copy.deepcopy(newElements)
+for i in range(len(newElements)):
+    for j in range(2):
+        del newPointsWithRep[i][j][2]
+        newPointsWithRep[i][j].append(0)
+
+newPoints = []
+
+for i in range(len(newPointsWithRep)):
+    for j in range(2):
+        if newPointsWithRep[i][j] not in newPoints:
+            newPoints.append(newPointsWithRep[i][j])
 
 # Tensão nos elementos
-
 
 # ----------------------------------------------------------------------------------------------------
 
@@ -467,42 +466,64 @@ with st.expander("Gráfico"):
 
     resposta = st.radio(
         "Gráficos",
-        ('Estrutura', 'Estrutura + Deformação', 'Estrutura + Tensões'))
+        ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões'))
+    numerar = st.radio(
+        "Numerar nós",
+        ('Sim', 'Não'))
 
     if resposta == 'Estrutura':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color="blue", linewidth='3')
+            ax.plot(xs, ys, zs, color="blue", linewidth=Ds[i]*5)
 
         for i in range(len(points)):
-            ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
-    elif resposta == 'Estrutura + Deformação':
+            ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=10)
+
+    elif resposta == 'Estrutura + Deslocamentos':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color="blue", linewidth='3')
+            ax.plot(xs, ys, zs, color=(0, 0, 1, .1), linewidth=Ds[i]*5)
 
         for i in range(len(points)):
-            ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2])
+            ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5)
 
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
-            ax.plot(xs, ys, zs, color="red", linewidth='3')
+            ax.plot(xs, ys, zs, color="magenta", linewidth=Ds[i]*5)
     else:
+        for k in range(len(elements)):
+            xs, ys, zs = zip(elements[k][0], elements[k][1])
+            ax.plot(xs, ys, zs, color=(0, 0, 0, .1), linewidth=Ds[k]*5)
+
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
 
-            if tensoes[i] < 0:
-                ax.plot(xs, ys, zs, color="blue", linewidth='3')
+            red_patch = mpatches.Patch(color='red', label='Maior tração')
+            black_patch = mpatches.Patch(color='black', label='Neutro')
+            blue_patch = mpatches.Patch(color='blue', label='Maior compressão')
 
+            for j in range(len(newPoints)):
+                ax.scatter(float(newPoints[j][0]), float(newPoints[j][1]), newPoints[j][2], s=10)
+
+            ax.legend(handles=[red_patch, black_patch, blue_patch])
+
+            if tensoes[i] > 0:
+                ax.plot(xs, ys, zs, color=(tensoes[i] / max(tensoes), 0, 0), linewidth=Ds[i]*5)
             else:
-                ax.plot(xs, ys, zs, color="#FF5F5F", linewidth='3')
+                ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i]*5)
 
     xsMinMax, ysMinMax, zsMinMax = [], [], []
+
     for i in range(len(newElements)):
         for j in range(2):
             xsMinMax.append(newElements[i][j][0])
             ysMinMax.append(newElements[i][j][1])
             zsMinMax.append(newElements[i][j][2])
+
+    if numerar == "Sim":
+        for i in range(len(pontoNoAgrupado)):
+            ax.text(pontoNoAgrupado[i][0][0] + .2, pontoNoAgrupado[i][0][1] + .2, pontoNoAgrupado[i][0][2] + .2,
+                    "{}".format(pontoNoAgrupado[i][1]), color='black', ha='left', va='bottom', size=6)
 
     ax.set_xlim(min(xsMinMax) - 2, max(xsMinMax) + 2)
     ax.set_ylim(min(ysMinMax) - 2, max(ysMinMax) + 2)

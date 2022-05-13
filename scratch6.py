@@ -1,32 +1,47 @@
-indicesElementos = [[1, 2], [2, 4], [3, 4], [2, 3]]
-deslocamentosComUeV = [['u2', 0.9681178212530336], ['v2', 0.22925263640531865], ['u3', 1.375615783763221], ['v3', 0]]
-elements = [[[0, 0, 0], [0, 9, 0]], [[0, 9, 0], [12, 0, 0]], [[12, 9, 0], [12, 0, 0]], [[0, 9, 0], [12, 9, 0]]]
-elementsComNos = [[[1, 0, 0], [2, 0, 9]], [[2, 0, 9], [4, 12, 0]], [[3, 12, 9], [4, 12, 0]], [[2, 0, 9], [3, 12, 9]]]
+forcas = [
+    ['u1', 0],
+    ['v1', 0],
+    ['u2', 0.722982865234678],
+    ['v2', 0.5520213880852799],
+    ['u3', 0.3915630531883688],
+    ['v3', 0.04617728797418982],
+    ['u4', 0.17971649019789504],
+    ['v4', 0.0549389782804736],
+    ['u5', 0.3225947325160351],
+    ['v5', 0.3334597660967966],
+    ['u6', 0.027706448498871356],
+    ['v6', 0.054938978280473616],
+    ['u7', 0.05541289699774274],
+    ['v7', 0.2150845700859244],
+    ['u8', 0.2862168872937959],
+    ['v8', -0.08120753237420587],
+    ['u9', 0.2635223511974343],
+    ['v9', -0.013785865772962307],
+    ['u10', 0],
+    ['v10', 0],
+    ['u11', 2.3213530966626585],
+    ['v11', -0.9011099206474089],
+    ['u12', 1.4523688118153995],
+    ['v12', -0.7494434204594251],
+    ['u13', 0.9808398159779376],
+    ['v13', -0.5268188457708309],
+    ['u14', 0.33747914753143415],
+    ['v14', -0.3075484066896934],
+    ['u15', 0.5654251504750933],
+    ['v15', -0.44766451438672084],
+    ['u16', 0.027706448498871356],
+    ['v16', -0.3075484066896934],
+    ['u17', 0],
+    ['v17', 0]
+]
+
+for i in range(0, len(forcas), 1):
+    del forcas[i][0]
 
 deslocamentosAgrupados = []
 
-for i in range(0, len(deslocamentosComUeV), 2):
-    deslocamentosAgrupados.append(
-        [int(list(deslocamentosComUeV[i][0])[1]), deslocamentosComUeV[i][1], deslocamentosComUeV[i + 1][1]])
 
-"""
-elementsComNos = [[[1, 0, 0], [2, 0, 9]], [[2, 0, 9], [4, 12, 0]], [[3, 12, 9], [4, 12, 0]], [[2, 0, 9], [3, 12, 9]]]
-deslocamentosAgrupados = [[2, 0.9681178212530336, 0.22925263640531865], [3, 1.375615783763221, 0]]
-"""
-elementsComNos = [[[1, 0, 0], [2, 12, 8]], [[2, 12, 8], [3, 12, 0]]]
-deslocamentosAgrupados = [[2, 0.8277357145490972, -0.18091114689216928]]
+for (i, j) in zip(range(0, len(forcas), 2), range(len(forcas))):
+    deslocamentosAgrupados.append([j + 1, forcas[i][0], forcas[i + 1][0]])
 
-for i in range(len(elementsComNos)):
-    for j in range(len(deslocamentosAgrupados)):
-        for k in range(2):
-            if elementsComNos[i][k][0] == deslocamentosAgrupados[j][0]:
-                elementsComNos[i][k][1] += deslocamentosAgrupados[j][1]
-                elementsComNos[i][k][2] += deslocamentosAgrupados[j][2]
-
-print(elementsComNos)
-
-for i in range(len(elementsComNos)):
-    for j in range(2):
-        del elementsComNos[i][j][0]
-
-print(elementsComNos)
+print("deslocamentosAgrupados", deslocamentosAgrupados)

@@ -64,83 +64,87 @@ if uploaded_file is not None:
     for row in pandasToPythonList:
         rows.append(row)
 
+resposta = st.radio("Mostrar elementos?", ('Sim', 'Não'), key="elem", index=1)
+
 col1, col2 = st.columns(2)
-for i in range(int(len(rows))):
-    if i % 2 == 0:
-        with col1:
-            with st.expander("Elemento {}".format(i + 1)):
-                st.subheader("Elemento {}".format(i + 1))
-                xp1, yp1, xp2, yp2, Ei, D = [
-                    st.number_input('x(p1) (m)',
-                                    value=rows[i][0],
-                                    key='x_key{}'.format(i)),
-                    st.number_input('y(p1) (m)',
-                                    value=rows[i][1],
-                                    key='x_key{}'.format(i)),
-                    st.number_input('x(p2) (m)',
-                                    value=rows[i][2],
-                                    key='x_key{}'.format(i),
-                                    disabled=False),
-                    st.number_input('y(p2) (m)',
-                                    value=rows[i][3],
-                                    key='x_key{}'.format(i),
-                                    disabled=False),
-                    st.number_input('E (N/m²)',
-                                    value=rows[i][4],
-                                    key='x_key{}'.format(i),
-                                    disabled=False),
-                    st.number_input('D (m)',
-                                    value=rows[i][5],
-                                    key='x_key{}'.format(i),
-                                    disabled=False)
-                ]
-    else:
-        with col2:
-            with st.expander("Elemento {}".format(i + 1)):
-                st.subheader("Elemento {}".format(i + 1))
-                xp1, yp1, xp2, yp2, Ei, D = [
-                    st.number_input('x(p1) (m)',
-                                    value=rows[i][0],
-                                    key='x_key{}'.format(i)),
-                    st.number_input('y(p1) (m)',
-                                    value=rows[i][1],
-                                    key='x_key{}'.format(i)),
-                    st.number_input('x(p2) (m)',
-                                    value=rows[i][2],
-                                    key='x_key{}'.format(i),
-                                    disabled=False),
-                    st.number_input('y(p2) (m)',
-                                    value=rows[i][3],
-                                    key='x_key{}'.format(i),
-                                    disabled=False),
-                    st.number_input('E (N/m²)',
-                                    value=rows[i][4],
-                                    key='x_key{}'.format(i),
-                                    disabled=False),
-                    st.number_input('D (m)',
-                                    value=rows[i][5],
-                                    key='x_key{}'.format(i),
-                                    disabled=False)
-                ]
 
-    xp1s.append(float(xp1))
-    yp1s.append(float(yp1))
-    xp2s.append(float(xp2))
-    yp2s.append(float(yp2))
+if resposta == 'Sim':
+    for i in range(int(len(rows))):
+        if i % 2 == 0:
+            with col1:
+                with st.expander("Elemento {}".format(i + 1)):
+                    st.subheader("Elemento {}".format(i + 1))
+                    xp1, yp1, xp2, yp2, Ei, D = [
+                        st.number_input('x(p1) (m)',
+                                        value=rows[i][0],
+                                        key='x_key{}'.format(i)),
+                        st.number_input('y(p1) (m)',
+                                        value=rows[i][1],
+                                        key='x_key{}'.format(i)),
+                        st.number_input('x(p2) (m)',
+                                        value=rows[i][2],
+                                        key='x_key{}'.format(i),
+                                        disabled=False),
+                        st.number_input('y(p2) (m)',
+                                        value=rows[i][3],
+                                        key='x_key{}'.format(i),
+                                        disabled=False),
+                        st.number_input('E (N/m²)',
+                                        value=rows[i][4],
+                                        key='x_key{}'.format(i),
+                                        disabled=False),
+                        st.number_input('D (m)',
+                                        value=rows[i][5],
+                                        key='x_key{}'.format(i),
+                                        disabled=False)
+                    ]
+        else:
+            with col2:
+                with st.expander("Elemento {}".format(i + 1)):
+                    st.subheader("Elemento {}".format(i + 1))
+                    xp1, yp1, xp2, yp2, Ei, D = [
+                        st.number_input('x(p1) (m)',
+                                        value=rows[i][0],
+                                        key='x_key{}'.format(i)),
+                        st.number_input('y(p1) (m)',
+                                        value=rows[i][1],
+                                        key='x_key{}'.format(i)),
+                        st.number_input('x(p2) (m)',
+                                        value=rows[i][2],
+                                        key='x_key{}'.format(i),
+                                        disabled=False),
+                        st.number_input('y(p2) (m)',
+                                        value=rows[i][3],
+                                        key='x_key{}'.format(i),
+                                        disabled=False),
+                        st.number_input('E (N/m²)',
+                                        value=rows[i][4],
+                                        key='x_key{}'.format(i),
+                                        disabled=False),
+                        st.number_input('D (m)',
+                                        value=rows[i][5],
+                                        key='x_key{}'.format(i),
+                                        disabled=False)
+                    ]
 
-    if [xp1, yp1] not in points:
-        points.append([xp1, yp1, 0])
-    if [xp2, yp2] not in points:
-        points.append([xp2, yp2, 0])
+        xp1s.append(float(xp1))
+        yp1s.append(float(yp1))
+        xp2s.append(float(xp2))
+        yp2s.append(float(yp2))
 
-    elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
-    comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
+        if [xp1, yp1] not in points:
+            points.append([xp1, yp1, 0])
+        if [xp2, yp2] not in points:
+            points.append([xp2, yp2, 0])
 
-    vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
-    Ls.append(comprimento)
-    Es.append(Ei)
-    Ds.append(D)
-    As.append(pi / 4 * float(D) ** 2)
+        elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
+        comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
+
+        vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
+        Ls.append(comprimento)
+        Es.append(Ei)
+        Ds.append(D)
+        As.append(pi / 4 * float(D) ** 2)
 
 listaP, pontoNo = [], []
 
@@ -297,51 +301,63 @@ n_elementos_matriz_de_forcas = 2 * len(pontoNo)
 
 forcas = []
 
-for i in range(len(pontoNo)):
-    if i % 2 == 0:
-        with col1:
-            with st.expander("Nó {}".format(i + 1)):
-                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
+resposta = st.radio("Mostrar nós?", ('Sim', 'Não'), key="elem", index=1)
 
-                if resposta == 'X':
-                    forcas.append(['u{}:'.format(i + 1), "R"])
-                    forcas.append(['v{}:'.format(i + 1), 0])
-                elif resposta == 'Y':
-                    forcas.append(['u{}:'.format(i + 1), 0])
-                    forcas.append(['v{}:'.format(i + 1), "R"])
-                elif resposta == 'XY':
-                    for j in (['u', 'v']):
-                        forcas.append(['{}{}'.format(j, i + 1), 'R'])
-                else:
-                    for (m, n) in zip(['x', 'y'], ['u', 'v']):
-                        novaResposta = st.number_input(
-                            "F{} (N)".format(m),
-                            value=0,
-                            key="nr{}".format(i),
-                        )
-                        forcas.append(['{}{}'.format(n, i + 1), novaResposta])
-    else:
-        with col2:
-            with st.expander("Nó {}".format(i + 1)):
-                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
+col1, col2 = st.columns(2)
+if resposta == "Sim":
+    for i in range(len(pontoNo)):
+        if i % 2 == 0:
+            with col1:
+                with st.expander("Nó {} ({}, {}, {})".format(i + 1,
+                                                             pontoNo[i][0],
+                                                             pontoNo[i][1],
+                                                             pontoNo[i][2]
+                                                             )):
+                    resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
 
-                if resposta == 'X':
-                    forcas.append(['u{}:'.format(i + 1), "R"])
-                    forcas.append(['v{}:'.format(i + 1), 0])
-                elif resposta == 'Y':
-                    forcas.append(['u{}:'.format(i + 1), 0])
-                    forcas.append(['v{}:'.format(i + 1), "R"])
-                elif resposta == 'XY':
-                    for j in (['u', 'v']):
-                        forcas.append(['{}{}'.format(j, i + 1), 'R'])
-                else:
-                    for (m, n) in zip(['x', 'y'], ['u', 'v']):
-                        novaResposta = st.number_input(
-                            "F{} (N)".format(m),
-                            value=0,
-                            key="nr{}".format(i),
-                        )
-                        forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+                    if resposta == 'X':
+                        forcas.append(['u{}:'.format(i + 1), "R"])
+                        forcas.append(['v{}:'.format(i + 1), 0])
+                    elif resposta == 'Y':
+                        forcas.append(['u{}:'.format(i + 1), 0])
+                        forcas.append(['v{}:'.format(i + 1), "R"])
+                    elif resposta == 'XY':
+                        for j in (['u', 'v']):
+                            forcas.append(['{}{}'.format(j, i + 1), 'R'])
+                    else:
+                        for (m, n) in zip(['x', 'y'], ['u', 'v']):
+                            novaResposta = st.number_input(
+                                "F{} (N)".format(m),
+                                value=0,
+                                key="nr{}".format(i),
+                            )
+                            forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+        else:
+            with col2:
+                with st.expander("Nó {} ({}, {}, {})".format(i + 1,
+                                                             pontoNo[i][0],
+                                                             pontoNo[i][1],
+                                                             pontoNo[i][2]
+                                                             )):
+                    resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
+
+                    if resposta == 'X':
+                        forcas.append(['u{}:'.format(i + 1), "R"])
+                        forcas.append(['v{}:'.format(i + 1), 0])
+                    elif resposta == 'Y':
+                        forcas.append(['u{}:'.format(i + 1), 0])
+                        forcas.append(['v{}:'.format(i + 1), "R"])
+                    elif resposta == 'XY':
+                        for j in (['u', 'v']):
+                            forcas.append(['{}{}'.format(j, i + 1), 'R'])
+                    else:
+                        for (m, n) in zip(['x', 'y'], ['u', 'v']):
+                            novaResposta = st.number_input(
+                                "F{} (N)".format(m),
+                                value=0,
+                                key="nr{}".format(i),
+                            )
+                            forcas.append(['{}{}'.format(n, i + 1), novaResposta])
 
 forcasFiltradoComUeV = []
 forcasFiltrado = []
@@ -380,16 +396,20 @@ for i in range(len(forcas)):
         elif forcas[i][0] == deslocamentosComUeV[j][0]:
             forcas[i][1] = deslocamentosComUeV[j][1]
 
-for i in range(0, len(forcas) - 1, 2):
-    if list(forcas[i][0])[0] == 'u' and list(forcas[i + 1][0])[0] == 'v':
-        deslocamentosAgrupados.append(
-            [int(list(forcas[i][0])[1]), forcas[i][1], forcas[i + 1][1]])
-    elif list(forcas[i][0])[0] == 'v':
-        deslocamentosAgrupados.append(
-            [int(list(forcas[i][0])[1]), 0, forcas[i + 1][1]])
-    else:
-        deslocamentosAgrupados.append(
-            [int(list(forcas[i][0])[1]), forcas[i][1], 0])
+for i in range(0, len(forcas), 1):
+    del forcas[i][0]
+
+deslocamentosAgrupados = []
+
+for (i, j) in zip(range(0, len(forcas), 2), range(len(forcas))):
+    deslocamentosAgrupados.append([j + 1, forcas[i][0], forcas[i + 1][0]])
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.write("forcas", forcas)
+with col2:
+    st.write("deslocamentosAgrupados", deslocamentosAgrupados)
 
 containerDeslocamentos = st.container()
 
@@ -408,6 +428,8 @@ for i in range(len(newElements)):
                 newElements[i][k][1] += deslocamentosAgrupados[j][1]
                 newElements[i][k][2] += deslocamentosAgrupados[j][2]
 
+st.write("deslocamentosAgrupados", deslocamentosAgrupados)
+st.write("newElements", newElements)
 # Deleta os índices da primeira posição usados como referência
 for i in range(len(newElements)):
     for j in range(2):
@@ -521,9 +543,9 @@ with st.expander("Gráfico"):
             zsMinMax.append(newElements[i][j][2])
 
     if numerar == "Sim":
-        for i in range(len(pontoNoAgrupado)):
-            ax.text(pontoNoAgrupado[i][0][0] + .2, pontoNoAgrupado[i][0][1] + .2, pontoNoAgrupado[i][0][2] + .2,
-                    "{}".format(pontoNoAgrupado[i][1]), color='black', ha='left', va='bottom', size=6)
+        for i in range(len(pontoNo)):
+            ax.text(pontoNo[i][0] + .2, pontoNo[i][1] + .2, pontoNo[i][2] + .2,
+                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=6)
 
     ax.set_xlim(min(xsMinMax) - 2, max(xsMinMax) + 2)
     ax.set_ylim(min(ysMinMax) - 2, max(ysMinMax) + 2)
@@ -537,5 +559,7 @@ with st.expander("Gráfico"):
     ax.view_init(elevation, azimuth)
 
     st.pyplot(fig)
+
+    st.write(newElements)
 
 # -----------------------------------------------------------------------------------------------------------

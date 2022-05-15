@@ -5,7 +5,6 @@ import numpy as np
 from sympy import pi, sin, cos, symbols, acos
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from mpl_toolkits.mplot3d import Axes3D
 import copy
 
 
@@ -36,7 +35,24 @@ vvs = []
 
 xp1s, yp1s, xp2s, yp2s = [], [], [], []
 
-st.sidebar.write("Hello, world!")
+with st.sidebar.expander("Exemplos"):
+    st.text('Básico')
+    image = Image.open('./images/estrutura_2.png')
+    st.image(image, use_column_width=True)
+    with open('./csv_files/estrutura_2.csv', 'rb') as f:
+        st.download_button('Baixar', f, file_name='estrutura_2.csv')
+
+    st.text('Deformações')
+    image = Image.open('./images/estrutura_11.png')
+    st.image(image, use_column_width=True)
+    with open('./csv_files/estrutura_11.csv', 'rb') as f:
+        st.download_button('Baixar', f, file_name='estrutura_11.csv')
+
+    st.text('Tensões + Deslocamentos')
+    image = Image.open('./images/estrutura_36.png')
+    st.image(image, use_column_width=True)
+    with open('./csv_files/estrutura_36.csv', 'rb') as f:
+        st.download_button('Baixar', f, file_name='estrutura_36.csv')
 
 st.title('Método dos Elementos Finitos')
 image = Image.open('./struc.png')
@@ -57,94 +73,70 @@ if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
 
     # Can be used wherever a "file-like" object is accepted:
-    dataframe = pd.read_csv(uploaded_file)
+    @st.cache(suppress_st_warning=True)
+    def readCSVFile(file):
+        return pd.read_csv(file)
 
-    pandasToPythonList = dataframe.values.tolist()
+    pandasToPythonList = readCSVFile(uploaded_file).values.tolist()
 
     for row in pandasToPythonList:
         rows.append(row)
 
-resposta = st.radio("Mostrar elementos?", ('Sim', 'Não'), key="elem", index=1)
+for i in range(int(len(rows))):
+    xp1, yp1, xp2, yp2, Ei, D = [
+                        rows[i][0],
+                        rows[i][1],
+                        rows[i][2],
+                        rows[i][3],
+                        rows[i][4],
+                        rows[i][5],
+    ]
 
-col1, col2 = st.columns(2)
+    xp1s.append(float(xp1))
+    yp1s.append(float(yp1))
+    xp2s.append(float(xp2))
+    yp2s.append(float(yp2))
 
-if resposta == 'Sim':
-    for i in range(int(len(rows))):
-        if i % 2 == 0:
-            with col1:
-                with st.expander("Elemento {}".format(i + 1)):
-                    st.subheader("Elemento {}".format(i + 1))
-                    xp1, yp1, xp2, yp2, Ei, D = [
-                        st.number_input('x(p1) (m)',
-                                        value=rows[i][0],
-                                        key='x_key{}'.format(i)),
-                        st.number_input('y(p1) (m)',
-                                        value=rows[i][1],
-                                        key='x_key{}'.format(i)),
-                        st.number_input('x(p2) (m)',
-                                        value=rows[i][2],
-                                        key='x_key{}'.format(i),
-                                        disabled=False),
-                        st.number_input('y(p2) (m)',
-                                        value=rows[i][3],
-                                        key='x_key{}'.format(i),
-                                        disabled=False),
-                        st.number_input('E (N/m²)',
-                                        value=rows[i][4],
-                                        key='x_key{}'.format(i),
-                                        disabled=False),
-                        st.number_input('D (m)',
-                                        value=rows[i][5],
-                                        key='x_key{}'.format(i),
-                                        disabled=False)
-                    ]
-        else:
-            with col2:
-                with st.expander("Elemento {}".format(i + 1)):
-                    st.subheader("Elemento {}".format(i + 1))
-                    xp1, yp1, xp2, yp2, Ei, D = [
-                        st.number_input('x(p1) (m)',
-                                        value=rows[i][0],
-                                        key='x_key{}'.format(i)),
-                        st.number_input('y(p1) (m)',
-                                        value=rows[i][1],
-                                        key='x_key{}'.format(i)),
-                        st.number_input('x(p2) (m)',
-                                        value=rows[i][2],
-                                        key='x_key{}'.format(i),
-                                        disabled=False),
-                        st.number_input('y(p2) (m)',
-                                        value=rows[i][3],
-                                        key='x_key{}'.format(i),
-                                        disabled=False),
-                        st.number_input('E (N/m²)',
-                                        value=rows[i][4],
-                                        key='x_key{}'.format(i),
-                                        disabled=False),
-                        st.number_input('D (m)',
-                                        value=rows[i][5],
-                                        key='x_key{}'.format(i),
-                                        disabled=False)
-                    ]
+    if [xp1, yp1] not in points:
+        points.append([xp1, yp1, 0])
+    if [xp2, yp2] not in points:
+        points.append([xp2, yp2, 0])
 
-        xp1s.append(float(xp1))
-        yp1s.append(float(yp1))
-        xp2s.append(float(xp2))
-        yp2s.append(float(yp2))
+    elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
+    comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
 
-        if [xp1, yp1] not in points:
-            points.append([xp1, yp1, 0])
-        if [xp2, yp2] not in points:
-            points.append([xp2, yp2, 0])
+    vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
+    Ls.append(comprimento)
+    Es.append(Ei)
+    Ds.append(D)
+    As.append(pi / 4 * float(D) ** 2)
 
-        elements.append([[float(xp1), float(yp1), 0], [float(xp2), float(yp2), 0]])
-        comprimento = ((float(xp2) - float(xp1)) ** 2 + (float(yp2) - float(yp1)) ** 2) ** .5
+# -------------------------------------------------------------------------------------------
+with st.sidebar.expander("Propriedades dos elementos"):
 
-        vvs.append([float(xp2) - float(xp1), float(yp2) - float(yp1)])
-        Ls.append(comprimento)
-        Es.append(Ei)
-        Ds.append(D)
-        As.append(pi / 4 * float(D) ** 2)
+    if st.checkbox("Diâmetro"):
+        modificarQuaisElementos = st.text_input(
+            "Elementos (1 a {})".format(len(elements)),
+            value='1',
+            key='check_d',
+            placeholder='1, 2, 4'
+        )
+        novoDiametro = st.number_input("D (m)", value=0.25)
+
+        for i in range(len(modificarQuaisElementos.split(','))):
+            Ds[int(modificarQuaisElementos.split(',')[i]) - 1] = novoDiametro
+
+    if st.checkbox("Módulo de elasticidade"):
+        modificarQuaisElementos = st.text_input(
+            "Elementos (1 a {})".format(len(elements)),
+            value='1',
+            key='check_E',
+            placeholder='1, 2, 4'
+        )
+        novoModuloE = st.number_input("E (MPa)", value=30000000)
+
+        for i in range(len(modificarQuaisElementos.split(','))):
+            Es[int(modificarQuaisElementos.split(',')[i]) - 1] = novoModuloE
 
 listaP, pontoNo = [], []
 
@@ -301,63 +293,63 @@ n_elementos_matriz_de_forcas = 2 * len(pontoNo)
 
 forcas = []
 
-resposta = st.radio("Mostrar nós?", ('Sim', 'Não'), key="elem", index=1)
-
 col1, col2 = st.columns(2)
-if resposta == "Sim":
-    for i in range(len(pontoNo)):
-        if i % 2 == 0:
-            with col1:
-                with st.expander("Nó {} ({}, {}, {})".format(i + 1,
-                                                             pontoNo[i][0],
-                                                             pontoNo[i][1],
-                                                             pontoNo[i][2]
-                                                             )):
-                    resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
 
-                    if resposta == 'X':
-                        forcas.append(['u{}:'.format(i + 1), "R"])
-                        forcas.append(['v{}:'.format(i + 1), 0])
-                    elif resposta == 'Y':
-                        forcas.append(['u{}:'.format(i + 1), 0])
-                        forcas.append(['v{}:'.format(i + 1), "R"])
-                    elif resposta == 'XY':
-                        for j in (['u', 'v']):
-                            forcas.append(['{}{}'.format(j, i + 1), 'R'])
-                    else:
-                        for (m, n) in zip(['x', 'y'], ['u', 'v']):
-                            novaResposta = st.number_input(
-                                "F{} (N)".format(m),
-                                value=0,
-                                key="nr{}".format(i),
-                            )
-                            forcas.append(['{}{}'.format(n, i + 1), novaResposta])
-        else:
-            with col2:
-                with st.expander("Nó {} ({}, {}, {})".format(i + 1,
-                                                             pontoNo[i][0],
-                                                             pontoNo[i][1],
-                                                             pontoNo[i][2]
-                                                             )):
-                    resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i), index=3)
+for i in range(len(pontoNo)):
+    if i % 2 == 0:
+        with col1:
+            with st.expander("Nó {}".format(i + 1,
+                                            pontoNo[i][0],
+                                            pontoNo[i][1],
+                                            pontoNo[i][2]
+                                            )):
+                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i),
+                                    index=3)
 
-                    if resposta == 'X':
-                        forcas.append(['u{}:'.format(i + 1), "R"])
-                        forcas.append(['v{}:'.format(i + 1), 0])
-                    elif resposta == 'Y':
-                        forcas.append(['u{}:'.format(i + 1), 0])
-                        forcas.append(['v{}:'.format(i + 1), "R"])
-                    elif resposta == 'XY':
-                        for j in (['u', 'v']):
-                            forcas.append(['{}{}'.format(j, i + 1), 'R'])
-                    else:
-                        for (m, n) in zip(['x', 'y'], ['u', 'v']):
-                            novaResposta = st.number_input(
-                                "F{} (N)".format(m),
-                                value=0,
-                                key="nr{}".format(i),
-                            )
-                            forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+                if resposta == 'X':
+                    forcas.append(['u{}:'.format(i + 1), "R"])
+                    forcas.append(['v{}:'.format(i + 1), 0])
+                elif resposta == 'Y':
+                    forcas.append(['u{}:'.format(i + 1), 0])
+                    forcas.append(['v{}:'.format(i + 1), "R"])
+                elif resposta == 'XY':
+                    for j in (['u', 'v']):
+                        forcas.append(['{}{}'.format(j, i + 1), 'R'])
+                else:
+                    for (m, n) in zip(['x', 'y'], ['u', 'v']):
+                        novaResposta = st.number_input(
+                            "F{} (N)".format(m),
+                            value=0,
+                            key="nr{}".format(i),
+                        )
+                        forcas.append(['{}{}'.format(n, i + 1), novaResposta])
+    else:
+        with col2:
+            with st.expander("Nó {}".format(i + 1,
+                                            pontoNo[i][0],
+                                            pontoNo[i][1],
+                                            pontoNo[i][2]
+                                            )):
+                resposta = st.radio("Quais as restrições?", ('X', 'Y', 'XY', 'L'), key="radio_{}".format(i),
+                                    index=3)
+
+                if resposta == 'X':
+                    forcas.append(['u{}:'.format(i + 1), "R"])
+                    forcas.append(['v{}:'.format(i + 1), 0])
+                elif resposta == 'Y':
+                    forcas.append(['u{}:'.format(i + 1), 0])
+                    forcas.append(['v{}:'.format(i + 1), "R"])
+                elif resposta == 'XY':
+                    for j in (['u', 'v']):
+                        forcas.append(['{}{}'.format(j, i + 1), 'R'])
+                else:
+                    for (m, n) in zip(['x', 'y'], ['u', 'v']):
+                        novaResposta = st.number_input(
+                            "F{} (N)".format(m),
+                            value=0,
+                            key="nr{}".format(i),
+                        )
+                        forcas.append(['{}{}'.format(n, i + 1), novaResposta])
 
 forcasFiltradoComUeV = []
 forcasFiltrado = []
@@ -406,11 +398,6 @@ for (i, j) in zip(range(0, len(forcas), 2), range(len(forcas))):
 
 col1, col2 = st.columns(2)
 
-with col1:
-    st.write("forcas", forcas)
-with col2:
-    st.write("deslocamentosAgrupados", deslocamentosAgrupados)
-
 containerDeslocamentos = st.container()
 
 with containerDeslocamentos.expander("Deslocamentos"):
@@ -428,8 +415,6 @@ for i in range(len(newElements)):
                 newElements[i][k][1] += deslocamentosAgrupados[j][1]
                 newElements[i][k][2] += deslocamentosAgrupados[j][2]
 
-st.write("deslocamentosAgrupados", deslocamentosAgrupados)
-st.write("newElements", newElements)
 # Deleta os índices da primeira posição usados como referência
 for i in range(len(newElements)):
     for j in range(2):
@@ -480,23 +465,33 @@ for i in range(len(newPointsWithRep)):
 # ----------------------------------------------------------------------------------------------------
 
 with st.expander("Gráfico"):
-    elevation = st.slider('Elevação', 0, 90, 90)
-    azimuth = st.slider('Azimute', 0, 360, 270)
-
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111, projection="3d")
 
-    resposta = st.radio(
-        "Gráficos",
-        ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões'))
-    numerar = st.radio(
-        "Numerar nós",
-        ('Sim', 'Não'))
+    with st.sidebar.expander("Visualização"):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            colorEstrutura = st.color_picker('Cor da estrutura', '#7159c1')
+        with col2:
+            colorDeformacao = st.color_picker('Cor da deformação', '#00f900')
+
+        resposta = st.radio(
+            "Gráficos",
+            ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões'))
+        numerar = st.checkbox("Numerar nós")
+        numerarElems = st.checkbox("Numerar elementos")
+        cotas = st.checkbox("Cotas")
+        setGrid = st.checkbox("Grid")
+
+        st.write("Rotação")
+        elevation = st.slider('Elevação', 0, 90, 90)
+        azimuth = st.slider('Azimute', 0, 360, 270)
 
     if resposta == 'Estrutura':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color="blue", linewidth=Ds[i]*5)
+            ax.plot(xs, ys, zs, color=colorEstrutura, linewidth=Ds[i] * 5)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=10)
@@ -504,35 +499,37 @@ with st.expander("Gráfico"):
     elif resposta == 'Estrutura + Deslocamentos':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=(0, 0, 1, .1), linewidth=Ds[i]*5)
+            ax.plot(xs, ys, zs, color=(0, 0, 1, .1), linewidth=Ds[i] * 5)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5)
 
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
-            ax.plot(xs, ys, zs, color="magenta", linewidth=Ds[i]*5)
+            ax.plot(xs, ys, zs, color=colorDeformacao, linewidth=Ds[i] * 5)
     else:
         for k in range(len(elements)):
             xs, ys, zs = zip(elements[k][0], elements[k][1])
-            ax.plot(xs, ys, zs, color=(0, 0, 0, .1), linewidth=Ds[k]*5)
+            ax.plot(xs, ys, zs, color=(0, 0, 0, .1), linewidth=Ds[k] * 5)
 
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
 
             red_patch = mpatches.Patch(color='red', label='Maior tração')
-            black_patch = mpatches.Patch(color='black', label='Neutro')
+            green_patch = mpatches.Patch(color=(0, 1, 0), label='Neutro')
             blue_patch = mpatches.Patch(color='blue', label='Maior compressão')
 
             for j in range(len(newPoints)):
                 ax.scatter(float(newPoints[j][0]), float(newPoints[j][1]), newPoints[j][2], s=10)
 
-            ax.legend(handles=[red_patch, black_patch, blue_patch])
+            ax.legend(handles=[red_patch, green_patch, blue_patch])
 
-            if tensoes[i] > 0:
-                ax.plot(xs, ys, zs, color=(tensoes[i] / max(tensoes), 0, 0), linewidth=Ds[i]*5)
-            else:
-                ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i]*5)
+            if tensoes[i] > .1*max(tensoes):
+                ax.plot(xs, ys, zs, color=(tensoes[i] / max(tensoes), 0, 0), linewidth=Ds[i] * 5)
+            elif tensoes[i] < .1*min(tensoes):
+                ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i] * 5)
+            elif .1*max(tensoes) > tensoes[i] >= .1*min(tensoes):
+                ax.plot(xs, ys, zs, color=(0, 1, 0), linewidth=Ds[i] * 5)
 
     xsMinMax, ysMinMax, zsMinMax = [], [], []
 
@@ -542,10 +539,26 @@ with st.expander("Gráfico"):
             ysMinMax.append(newElements[i][j][1])
             zsMinMax.append(newElements[i][j][2])
 
-    if numerar == "Sim":
+    if numerar:
         for i in range(len(pontoNo)):
             ax.text(pontoNo[i][0] + .2, pontoNo[i][1] + .2, pontoNo[i][2] + .2,
-                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=6)
+                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=5   )
+
+    # Numerando os elementos
+    midPointNewElements = []
+
+    for i in range(len(newElements)):
+        midPointNewElements.append([])
+
+    for j in range(3):
+        for i in range(len(newElements)):
+            midPoint = (newElements[i][0][j] + newElements[i][1][j]) * .5
+            midPointNewElements[i].append(midPoint)
+
+    if numerarElems:
+        for i in range(len(midPointNewElements)):
+            ax.text(midPointNewElements[i][0] + .2, midPointNewElements[i][1] + .2, midPointNewElements[i][2] + .2,
+                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=4)
 
     ax.set_xlim(min(xsMinMax) - 2, max(xsMinMax) + 2)
     ax.set_ylim(min(ysMinMax) - 2, max(ysMinMax) + 2)
@@ -554,12 +567,22 @@ with st.expander("Gráfico"):
     ax.set_ylabel("y")
     ax.set_zlabel("z")
 
-    ax.grid(False)
+    if not setGrid:
+        ax.grid(False)
+
+    if not cotas:
+        ax.set_yticks([])
+        ax.set_xticks([])
+        ax.set_zticks([])
 
     ax.view_init(elevation, azimuth)
 
     st.pyplot(fig)
 
-    st.write(newElements)
+with st.sidebar.expander("Ajuda"):
+    with open('./instructions/instructions.pdf', 'rb') as f:
+        st.download_button('Documentação', f, file_name='instructions.pdf')
 
 # -----------------------------------------------------------------------------------------------------------
+
+st.write(Es)

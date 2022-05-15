@@ -1,16 +1,7 @@
-newElements = [
-    [[0, 0, 0], [13.656068809997848, 7.637834395668932, 0]],
-    [[12, 0, 0], [13.656068809997848, 7.637834395668932, 0]]
-]
+from scratch6 import somaAeB, retornaIndices
 
-midPointNewElements = []
+print(somaAeB(1, 5))
 
-for i in range(len(newElements)):
-    midPointNewElements.append([])
+array = [1, 2, 3, 4, 65, 7]
 
-for j in range(3):
-    for i in range(len(newElements)):
-        midPoint = (newElements[i][0][j] + newElements[i][1][j])*.5
-        midPointNewElements[i].append(midPoint)
-
-print(midPointNewElements)
+print(retornaIndices(array, 65))

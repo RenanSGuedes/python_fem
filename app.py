@@ -35,6 +35,11 @@ vvs = []
 
 xp1s, yp1s, xp2s, yp2s = [], [], [], []
 
+with st.sidebar:
+    st.title("Bem vindo!")
+    image = Image.open('./images/bridge.png')
+    st.image(image, use_column_width=True)
+
 with st.sidebar.expander("Exemplos"):
     st.text('Básico')
     image = Image.open('./images/estrutura_2.png')
@@ -121,10 +126,11 @@ with st.sidebar.expander("Propriedades dos elementos"):
             key='check_d',
             placeholder='1, 2, 4'
         )
-        novoDiametro = st.number_input("D (m)", value=0.25)
+        novoDiametro = st.number_input("D (m)", value=Ds[1])
 
         for i in range(len(modificarQuaisElementos.split(','))):
             Ds[int(modificarQuaisElementos.split(',')[i]) - 1] = novoDiametro
+            As[int(modificarQuaisElementos.split(',')[i]) - 1] = pi / 4 * float(novoDiametro) ** 2
 
     if st.checkbox("Módulo de elasticidade"):
         modificarQuaisElementos = st.text_input(
@@ -133,7 +139,7 @@ with st.sidebar.expander("Propriedades dos elementos"):
             key='check_E',
             placeholder='1, 2, 4'
         )
-        novoModuloE = st.number_input("E (MPa)", value=30000000)
+        novoModuloE = st.number_input("E (MPa)", value=Es[1])
 
         for i in range(len(modificarQuaisElementos.split(','))):
             Es[int(modificarQuaisElementos.split(',')[i]) - 1] = novoModuloE
@@ -403,8 +409,8 @@ containerDeslocamentos = st.container()
 with containerDeslocamentos.expander("Deslocamentos"):
     for i in range(len(deslocamentosAgrupados)):
         st.subheader("Nó {}".format(i + 1))
-        st.write("u{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][1], ".4f")))
-        st.write("v{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][2], ".4f")))
+        st.write("u{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][1], ".8f")))
+        st.write("v{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][2], ".8f")))
 
 newElements = copy.deepcopy(elementsComNos)
 
@@ -480,9 +486,9 @@ with st.expander("Gráfico"):
             "Gráficos",
             ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões'))
         numerar = st.checkbox("Numerar nós")
+        numerarPosDeformacao = st.checkbox("Numerar nós deslocados")
         numerarElems = st.checkbox("Numerar elementos")
-        cotas = st.checkbox("Cotas")
-        setGrid = st.checkbox("Grid")
+        cotas = st.checkbox("Cotas e Grid")
 
         st.write("Rotação")
         elevation = st.slider('Elevação', 0, 90, 90)
@@ -542,7 +548,7 @@ with st.expander("Gráfico"):
     if numerar:
         for i in range(len(pontoNo)):
             ax.text(pontoNo[i][0] + .2, pontoNo[i][1] + .2, pontoNo[i][2] + .2,
-                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=5   )
+                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=5)
 
     # Numerando os elementos
     midPointNewElements = []
@@ -560,15 +566,17 @@ with st.expander("Gráfico"):
             ax.text(midPointNewElements[i][0] + .2, midPointNewElements[i][1] + .2, midPointNewElements[i][2] + .2,
                     "{}".format(i + 1), color='black', ha='left', va='bottom', size=4)
 
+    if numerarPosDeformacao:
+        for m in range(len(newPoints)):
+            ax.text(newPoints[m][0] + .2, newPoints[m][1] + .2, newPoints[m][2] + .2,
+                    "{}'".format(m + 1), color='black', ha='left', va='bottom', size=5)
+
     ax.set_xlim(min(xsMinMax) - 2, max(xsMinMax) + 2)
     ax.set_ylim(min(ysMinMax) - 2, max(ysMinMax) + 2)
     ax.set_zlim(min(zsMinMax) - 2, max(zsMinMax) + 2)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
-
-    if not setGrid:
-        ax.grid(False)
 
     if not cotas:
         ax.set_yticks([])
@@ -584,5 +592,3 @@ with st.sidebar.expander("Ajuda"):
         st.download_button('Documentação', f, file_name='instructions.pdf')
 
 # -----------------------------------------------------------------------------------------------------------
-
-st.write(Es)

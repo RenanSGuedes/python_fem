@@ -1,4 +1,4 @@
-from scratch6 import somaAeB, retornaIndices
+from fittingCurve import somaAeB, retornaIndices
 
 print(somaAeB(1, 5))
 

@@ -6,6 +6,7 @@ from sympy import pi, sin, cos, symbols, acos
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import copy
+from fittingCurve import construirGraficoInterpolado
 
 
 def bmatrix(par):
@@ -82,6 +83,7 @@ if uploaded_file is not None:
     def readCSVFile(file):
         return pd.read_csv(file)
 
+
     pandasToPythonList = readCSVFile(uploaded_file).values.tolist()
 
     for row in pandasToPythonList:
@@ -89,12 +91,12 @@ if uploaded_file is not None:
 
 for i in range(int(len(rows))):
     xp1, yp1, xp2, yp2, Ei, D = [
-                        rows[i][0],
-                        rows[i][1],
-                        rows[i][2],
-                        rows[i][3],
-                        rows[i][4],
-                        rows[i][5],
+        rows[i][0],
+        rows[i][1],
+        rows[i][2],
+        rows[i][3],
+        rows[i][4],
+        rows[i][5],
     ]
 
     xp1s.append(float(xp1))
@@ -118,7 +120,6 @@ for i in range(int(len(rows))):
 
 # -------------------------------------------------------------------------------------------
 with st.sidebar.expander("Propriedades dos elementos"):
-
     if st.checkbox("Diâmetro"):
         modificarQuaisElementos = st.text_input(
             "Elementos (1 a {})".format(len(elements)),
@@ -530,11 +531,11 @@ with st.expander("Gráfico"):
 
             ax.legend(handles=[red_patch, green_patch, blue_patch])
 
-            if tensoes[i] > .1*max(tensoes):
+            if tensoes[i] > .1 * max(tensoes):
                 ax.plot(xs, ys, zs, color=(tensoes[i] / max(tensoes), 0, 0), linewidth=Ds[i] * 5)
-            elif tensoes[i] < .1*min(tensoes):
+            elif tensoes[i] < .1 * min(tensoes):
                 ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i] * 5)
-            elif .1*max(tensoes) > tensoes[i] >= .1*min(tensoes):
+            elif .1 * max(tensoes) > tensoes[i] >= .1 * min(tensoes):
                 ax.plot(xs, ys, zs, color=(0, 1, 0), linewidth=Ds[i] * 5)
 
     xsMinMax, ysMinMax, zsMinMax = [], [], []
